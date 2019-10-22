@@ -1,13 +1,18 @@
-function [] = SimpleSolution(dtmax, endtime, t_on_CSG,t_on_PUMP,geometric)
 %% Simiple version of the problem
 % Solve the advection diffusion problem
+clear all; clc; close all;
 % Problem setup
 Lx = 500;
 Lz = 100;
-dt_o = 2;
-%% Generate a uniform mesh with N node points
-if length(geometric) == 3
-    % Complex Mesh with each regions modelled seperately. 
+dt_o = 2; dtmax = 360;endtime = 100*365; t_on_CSG = 360*5; t_on_PUMP = 360*5;
+dx =50;dz = 2;
+
+geometric = [dx dz];
+geometric = 1;
+%%
+
+
+% Complex Mesh with each regions modelled seperately. 
 
 % x1 = GP_sym(0,50,50/2,1.01); x2 = GP_sym(50,300,250/2,1.02); x3 = GP_sym(300,350,50/2,1.02);  x4 = GP_sym(350,500,150/2,1.02);
 % 
@@ -16,16 +21,11 @@ if length(geometric) == 3
 % x=[x1(1:end-1),x2(1:end-1),x3(1:end-1),x4]; z = [z1(1:end-1),z2(1:end-1),z3(1:end-1),z4(1:end-1),z5];
 
 % Simple Mesh with geometric progression
-nx = geometric(2);
-nz = geometri(3);
-x = round(GP_sym(0,500,nx,1.3),4); z = round(GP_sym(0,100,ny,1.5),4);
+x = round(GP_sym(0,500,21,1.3),4); z = round(GP_sym(0,100,11,1.5),4);
 o_x = x; o_z = z;
-else 
-    dx = geometric(1);
-    dz = geometric(2);
-o_x = 0:dx:Lx;
-o_z = 0:dz:Lz;
-end
+clear x z
+%%
+
 Nx = length(o_x);
 Nz = length(o_z);
 
@@ -235,5 +235,4 @@ while t<endtime
    title(sprintf('t = %.2f (years) (current dt = %.2f (days))',t/365,dt));
    t = t+dt;
     drawnow
-end
 end
