@@ -1,4 +1,4 @@
-function [x_out,success] = NEW_Newton_Solver(F,x,Jacobian)
+function [x_out,success] = NEW_Newton_Solver(F,x,Jacobian, F_in)
 %% Inexact Newton
 success = true;
 tola = 1e-6;
@@ -12,7 +12,7 @@ m = 3; % Number of steps until you update jacobian.
 preverr = 0;
 maxerr = 1e0;
 err =Inf;
-J = Jacobian(F,x,Resid);  
+J = Jacobian(F,x,Resid,F_in);  
 k = 0;
 setup.type = 'nofill';
 setup.milu = 'off';
@@ -20,7 +20,7 @@ setup.droptol = 1e-6;
    M = ilu(sparse(J),setup);
 while err > tol && k < MaxIters
     if mod(k,m)==0 || preverr < err
-    J = Jacobian(F,x,Resid);  
+    J = Jacobian(F,x,Resid,F_in);  
    
     end
     dx = J\(-Resid);

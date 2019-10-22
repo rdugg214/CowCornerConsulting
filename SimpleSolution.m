@@ -204,9 +204,10 @@ while t<endtime
 %     h = fsolve(@(h) FVM(h,dt, t, t_old,h_old, params),h_old,optimoptions('fsolve','Display','off')); 
 %     tic
     F = @(h) FVM(h,dt, t, t_old,h_old, params);
+    F_in = @(h, index) FVM_index(h, dt, t, t_old, h_old, params, index);
 %     toc
-    Jacobian = @(F,x,Fx0) NEW_JacobianFD(F,x,Fx0);
-    [h,success] = NEW_Newton_Solver(F,h_old,Jacobian);
+    Jacobian = @(F,x,Fx0,F_in) NEW_JacobianFD(F,x,Fx0,F_in);
+    [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, F_in);
     if success == false;
         ftsuccess = false;
     fprintf('New dt = %3.2f\n',dt);
