@@ -38,7 +38,7 @@ while err > tol && k < MaxIters
         lambda_star = (F_norm * lambda^2)/(Fxt_norm + F_norm * (2 * lambda - 1));
         if lambda_star < lambda * 0.1
             lambda = lambda * 0.1;
-        elseif lambda_star > lambda * 0.5
+        elseif lambda_start > lambda * 0.5
             lambda = lambda * 0.5;
         else
             lambda = lambda_star;

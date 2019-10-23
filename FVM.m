@@ -18,6 +18,7 @@ DELTAX =  params{15};   %vector size h
 DELTAZ = params{16};    %vector size h
 t_on_CSG = params{17};
 t_on_PUMP = params{18};
+
 S_new = CalcS(h, alpha, n, m);
 S_old = CalcS(h_old, alpha, n, m);
 

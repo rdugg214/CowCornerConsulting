@@ -1,4 +1,4 @@
-function J = NEW_JacobianFD(F, x, Fx0, F_in)
+function J = NEW_JacobianFD(F, x, Fx0, params, dt, t, t_old, h_old)
 % Why recalculate Fx0 all the time should be known from newton iterate.
 % ndiag_Jacobian - created by Eamon Conway
 % Efficiently calculates the jacobian for a banded system. 
@@ -22,40 +22,42 @@ else
 end
 I = sparse(eye(N,N));
 
+old_method_time = 0;
+new_method_time = 0;
+
+FVM_PC = @(h) FVM_pre_calcs(h, dt, t, params);
+[k_old, psi_old, Q_old, ~] = FVM_PC(h_old);
+F_in = @(h, index, k_new, psi_new, Q, Kzz) FVM_index(h,dt, t, t_old,h_old, params, index, k_old, psi_old, Q_old, k_new, psi_new, Q, Kzz);
 for j = 1:N
-%      Fpert = F(x +  (h / norm(I(:,j),2) )*I(:,j));
-     Fpert = F(x);
-%      Fpert = F(x +  h*I(:,j));
+    tic;
+    Fpert = F(x +  h*I(:,j));
     Jcol = (Fpert - Fx0)/(h / norm(I(:,j),2) );
-    %Update the vector of Diagonals. % Yes, you can vectorise this in a
-    %smart way, my tests indicate that the vectorised version is slower. 
     J(:,j) = Jcol;
+    old_method_time = old_method_time + toc;
     
-    
-    J_test(j, j) = F_in(x, j);
-%     J_test(j, j) = F_in(x + h*I(:,j), j);
-%     J_test(j, j) = (F_in(x + h*I(:,j), j) - Fx0(j))/h;
-    diag_offsets = [1, 11];
+    tic;
+    [k_new, psi_new, Q, Kzz] = FVM_PC(x + h*I(:,j));
+    J_test(j, j) = (F_in(x + h*I(:,j), j, k_new, psi_new, Q, Kzz) - Fx0(j))/h;
+    diag_offsets = [1, params{2}];
     for k = 1:length(diag_offsets)
-        if (j - diag_offsets(k)) > 0
-            J_test(j - diag_offsets(k), j) = F_in(x, j - diag_offsets(k));
-%             J_test(j - diag_offsets(k), j) = (F_in(x, j - diag_offsets(k)) - Fx0(j))/h;
+        vert_neg_index = j - diag_offsets(k);
+        vert_pos_index = j + diag_offsets(k);
+        if (vert_neg_index) > 0
+            J_test(vert_neg_index, j) = (F_in(x + h*I(:,j), vert_neg_index, k_new, psi_new, Q, Kzz) - Fx0(vert_neg_index))/h;
         end
-        if (j + diag_offsets(k)) <= N
-            J_test(j + diag_offsets(k), j) = F_in(x, j + diag_offsets(k));
-%             J_test(j + diag_offsets(k), j) = (F_in(x, j + diag_offsets(k)) - Fx0(j))/h;
+        if (vert_pos_index) <= N
+            J_test(vert_pos_index, j) = (F_in(x + h*I(:,j), vert_pos_index, k_new, psi_new, Q, Kzz) - Fx0(vert_pos_index))/h;
         end
     end
-    if ~isequal(Fpert, J_test(:,j))
-        disp(J(:,j));
+    new_method_time = new_method_time + toc;
+    Jcol = sparse(Jcol);
+    if ~isequal(Jcol, J_test(:,j))
+        disp(Jcol);
         disp(J_test(:,j));
         error("This is where is should fucking stop")
     end
 end
-disp(J)
-figure
-spy(J)
-figure
-spy(J - J_test)
-
+% disp(old_method_time);
+% disp(new_method_time);
+% spy(J - J_test)
 end
