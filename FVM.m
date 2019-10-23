@@ -1,4 +1,4 @@
- function [F,flux_n,flux_s,flux_e,flux_w] = FVM(h,dt, t, t_old,h_old, params)
+ function [F,h_gain] = FVM(h,dt, t, t_old,h_old, params)
 % Parameters IN
 N = params{1};          %value
 Nx = params{2};         %value
@@ -18,18 +18,22 @@ DELTAX =  params{15};   %vector size h
 DELTAZ = params{16};    %vector size h
 t_on_CSG = params{17};
 t_on_PUMP = params{18};
+simple = params{19};
+Pr = params{20};
+hetgen = params{21};
 
 S_new = CalcS(h, alpha, n, m);
 S_old = CalcS(h_old, alpha, n, m);
 
 
-k_new = Calck(h, S_new, m);
-k_old = Calck(h_old, S_old, m);
+k_new = Calck(h, S_new, m,x,z,dx,dz,hetgen);
+k_old = Calck(h_old, S_old, m,x,z,dx,dz,hetgen);
 
-psi_new = CalcPsi(h, S_new, psi_res, psi_sat);
-psi_old = CalcPsi(h_old, S_old, psi_res, psi_sat);
-[Q,Kzz]=  Calc_Q(h,x,z,dt,psi_new,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ); %To be updated
-Q_old =  Calc_Q(h_old,x,z,dt,psi_old,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ);
+psi_new = CalcPsi(h, S_new, psi_res, psi_sat,x,z,dx,dz,hetgen);
+psi_old = CalcPsi(h_old, S_old, psi_res, psi_sat,x,z,dx,dz,hetgen);
+
+[Q,Kzz]=  Calc_Q(h,x,z,dt,psi_new,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr); %To be updated
+Q_old =  Calc_Q(h_old,x,z,dt,psi_old,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr);
 theta = 0.5;
 
 %% Flux Terms INSIDE
@@ -68,8 +72,8 @@ for i = 1:Nz
         flux_w_old(index) = -((k_old(index) + k_old(index-1))/2) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
         elseif i >= 2 &&i <= Nz-1 && j ==1
          if 80 <= z(index) && z(index) <= 100
-            flux_w(index) = Calc_RiverBound(z(index),h(index));
-            flux_w_old(index) = Calc_RiverBound(z(index),h_old(index));
+            flux_w(index) = Calc_RiverBound(z(index),h(index),simple);
+            flux_w_old(index) = Calc_RiverBound(z(index),h_old(index),simple);
         end
         flux_n(index) = -((k_new(index+Nx) + k_new(index))/2) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
         flux_s(index) = -((k_new(index) + k_new(index-Nx))/2) * Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
@@ -89,8 +93,8 @@ for i = 1:Nz
         flux_w_old(index) = -((k_old(index) + k_old(index-1))/2) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
         flux_s_old(index) = -((k_old(index) + k_old(index-Nx))/2) * Kzz(index) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
         elseif i == Nz && j == 1
-             flux_w(index) = Calc_RiverBound(z(index),h(index));
-        flux_w_old(index) = Calc_RiverBound(z(index),h_old(index));
+             flux_w(index) = Calc_RiverBound(z(index),h(index),simple);
+        flux_w_old(index) = Calc_RiverBound(z(index),h_old(index),simple);
         flux_n(index) = Calc_RainBound(t,h(index),DELTAX(index));
         flux_n_old(index) = Calc_RainBound(t_old,h_old(index),DELTAX(index));
         flux_s(index) = -((k_new(index) + k_new(index-Nx))/2) * Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
@@ -134,26 +138,10 @@ for i = 1:Nz
             flux_s_old(index))) - Q_old(index));
     end
 end
+h_gain.n = flux_n ;
+h_gain.e = flux_e ;
+h_gain.s = flux_s ;
+h_gain.w = flux_w ;
+h_gain.Q = Q-Q_old;
 
-%% Region ALL
-
-%
-%% Region 1
-
-
-% if t >20
-%     figure('units','normalized','outerposition',[0 0 0.8 0.8])
-% subplot(1,5,1)
-% plot3(x,z,(flux_n-flux_s),'.')
-% subplot(1,5,2)
-% plot3(x,z,(flux_e-flux_w),'.')
-% subplot(1,5,3)
-% plot3(x,z,(Q),'.')
-% subplot(1,5,4)
-% plot3(x,z,(h-h_old),'.')
-% subplot(1,5,5)
-% plot3(x,z,(F),'.')
-% 
-%     error('help')
-% end
 end

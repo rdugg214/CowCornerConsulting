@@ -1,9 +1,10 @@
-function [x_out,success] = NEW_Newton_Solver(F,x,Jacobian, type)
+function [x_out,success] = NEW_Newton_Solver(F,x0,Jacobian, type)
 %% Inexact Newton
 success = true;
 tola = 1e-6;
 tolr = 1e-6;
 fprintf('\n Inexact Newton Method:\n');
+x = x0;
 Resid = F(x);
 MaxIters = 15;
 tol = tola + norm(x)*tolr;
@@ -27,10 +28,9 @@ while err > tol && k < MaxIters
         M = Find_Precon_Mat(J, "SOR", 5);
         dx = IanGMRES(J,-Resid,x,M,tol,20,0);
     end
-     lambda = 1;
+    lambda = 1;
     alpha = 1e-2;
     xt = x + lambda*dx;
-%     xt = x;
     line_search_count = 0;
     F_norm = norm(F(x),1)^2;
     Fxt_norm = norm(F(xt),1)^2;
@@ -60,5 +60,6 @@ while err > tol && k < MaxIters
          break
     end
 end
+
 
 x_out = x;

@@ -1,6 +1,6 @@
 function helper_plotcmap(X,Z,MAT_psi,MAT_h,m)
 figure(m)
-    subplot(1,3,1)
+    subplot(1,4,1)
     surf(X,Z,MAT_h)
     caxis([-10 2])
     axis([0 500 0 100])
@@ -10,7 +10,7 @@ colorbar
     view(2)
    
 
-   subplot(1,3,2)
+   subplot(1,4,2)
     surf(X,Z,MAT_psi)
     colormap((parula))
     shading interp

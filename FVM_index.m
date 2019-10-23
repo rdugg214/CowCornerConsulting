@@ -18,6 +18,9 @@ DELTAX =  params{15};   %vector size h
 DELTAZ = params{16};    %vector size h
 t_on_CSG = params{17};
 t_on_PUMP = params{18};
+simple = params{19};
+Pr = params{20};
+hetgen = params{21};
 
 theta = 0.5;
 
@@ -62,8 +65,8 @@ elseif  i == 1 && j == Nx
     flux_w_old = -((k_old(index) + k_old(index-1))/2) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
 elseif i >= 2 &&i <= Nz-1 && j ==1
     if 80 <= z(index) && z(index) <= 100
-        flux_w = Calc_RiverBound(z(index),h(index));
-        flux_w_old = Calc_RiverBound(z(index),h_old(index));
+        flux_w = Calc_RiverBound(z(index),h(index),simple);
+        flux_w_old = Calc_RiverBound(z(index),h_old(index),simple);
     end
     flux_n = -((k_new(index+Nx) + k_new(index))/2) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
     flux_s = -((k_new(index) + k_new(index-Nx))/2) * Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
@@ -83,8 +86,8 @@ elseif i >=2 && i<=Nz-1 && j==Nx
     flux_w_old = -((k_old(index) + k_old(index-1))/2) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
     flux_s_old = -((k_old(index) + k_old(index-Nx))/2) * Kzz(index) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
 elseif i == Nz && j == 1
-    flux_w = Calc_RiverBound(z(index),h(index));
-    flux_w_old = Calc_RiverBound(z(index),h_old(index));
+    flux_w = Calc_RiverBound(z(index),h(index),simple);
+    flux_w_old = Calc_RiverBound(z(index),h_old(index),simple);
     flux_n = Calc_RainBound(t,h(index),DELTAX(index));
     flux_n_old = Calc_RainBound(t_old,h_old(index),DELTAX(index));
     flux_s = -((k_new(index) + k_new(index-Nx))/2) * Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
@@ -126,6 +129,5 @@ F = psi_new(index) - psi_old(index) + ...
     (1 - theta) * dt * ( (1/DELTAX(index) * (flux_e_old + ...
     flux_w_old)) + ((1/DELTAZ(index)) * (flux_n_old + ...
     flux_s_old)) - Q_old(index));
-
 % F = F(index);
 end
