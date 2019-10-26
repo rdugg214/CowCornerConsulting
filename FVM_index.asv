@@ -46,7 +46,7 @@ if (index ~= (i-1)*Nx + j)
     fprintf("i: %d, j: %d \n", i, j);
     error("This is where is should fucking stop")
 end
-if i>=2 && i<= Nz-1 && j >=2 && j<= Nx-1
+if i>j >=2 && j<= Nx-1
     flux_n = - k_face(k_new,index,Nx) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
     flux_w = - k_face(k_new,index,-1) * Kxx(index) * ( (H(index-1) - H(index))/dx(index-1));
     flux_s = - k_face(k_new,index,-Nx)* Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
