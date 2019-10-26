@@ -15,7 +15,8 @@ function helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_gu
      
      
       subplot(1,4,4)
-      plot(t_hist,Ballarr(3,:));
+      plot(t_hist,-Ballarr);
+      legend('River','CSG','Rain')
 %      'LineWidth',2,
 %       ylim([0.04 0.06])
     hold off

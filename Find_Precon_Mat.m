@@ -9,6 +9,6 @@ function M = Find_Precon_Mat(A, type, omega)
         setup.type = 'nofill';
         setup.milu = 'off';
         setup.droptol = 1e-6;
-        M = ilu(A, setup);
+        M = ilu(sparse(A), setup);
     end
 end

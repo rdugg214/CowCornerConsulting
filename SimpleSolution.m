@@ -173,8 +173,9 @@ m = 1 - (1./n);
 % Kxx(:) = Kxx(2);
 % Kzz(:) = Kzz(2);
 % alpha(:) = alpha(2);
+load prediction_data.mat
 params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
-    Kxx , Kzz , dx , dz, DELTAX, DELTAZ,t_on_CSG,t_on_PUMP, simple,Pr,hetgen};
+    Kxx , Kzz , dx , dz, DELTAX, DELTAZ,t_on_CSG,t_on_PUMP, simple,Pr,hetgen,prediction_data};
 
 %% Generate Initial Solution
 h_old = zeros(size(x));
@@ -232,10 +233,11 @@ while t<endtime
     end
     omega =0.5;
     end
-    if ftsuccess == true & (dt/omega)/omega <dtmax
-    dt = min(dtmax,(dt/omega)/omega);
-     fprintf('New dt = %3.8f\n',dt);
-    end
+    dt = (dt/omega)/(omega*0.75);
+%     if ftsuccess == true & (dt/omega)/omega <dtmax
+%     dt = min(dtmax,(dt/omega)/omega);
+%      fprintf('New dt = %3.8f\n',dt);
+%     end
     fprintf('Success!\n')
     
     t_hist = [t_hist t];
@@ -245,7 +247,8 @@ while t<endtime
     Balvals = [sum(hgain.w(Ballocs(1,:))./DELTAX(Ballocs(1,:))); ...
     sum(hgain.e(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
      sum(hgain.n(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
-    Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
+%     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
+     Ballarr(:,end+1) =   Balvals;
     % comparison average vs current
     psi_old = psi_now;
     psi_now = helper_getpsinow(h, alpha,n,m,psi_res,psi_sat,x,z,dx,dz,hetgen);

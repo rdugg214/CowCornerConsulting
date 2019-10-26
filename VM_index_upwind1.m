@@ -21,7 +21,8 @@ t_on_PUMP = params{18};
 simple = params{19};
 Pr = params{20};
 hetgen = params{21};
-prediction_data = params{22};
+sigmax = 1;
+sigmaz = 1;
 theta = 0.5;
 
 %% Flux Terms INSIDE
@@ -47,30 +48,30 @@ if (index ~= (i-1)*Nx + j)
     error("This is where is should fucking stop")
 end
 if i>=2 && i<= Nz-1 && j >=2 && j<= Nx-1
-    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
-    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - H(index))/dx(index-1));
-    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
-    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index+1) - H(index))/dx(index));
+    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index) + (sigmaz/2)*(H(index+Nx) - H(index)))/dz(index));
+    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - (sigmax/2)*(H(index-1) - H(index)))/dx(index-1));
+    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - (sigmaz/2)*(H(index-Nx) - H(index)))/dz(index-Nx));
+    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index) + (sigmax/2)*(H(index+1) - H(index)))/dx(index));
     
     flux_n_old = - k_face(k_old,dz,index,Nx) * Kzz(index) * ( (H_old(index+Nx) - H_old(index))/dz(index));
     flux_w_old = - k_face(k_old,dx,index,-1) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
     flux_s_old = - k_face(k_old,dz,index,-Nx) * Kzz(index) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
     flux_e_old = - k_face(k_old,dx,index,1) * Kxx(index) * ( (H_old(index+1) - H_old(index))/dx(index));
 elseif i == 1 && j == 1
-    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
-    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index+1) - H(index))/dx(index));
+    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index) + (sigmaz/2)*(H(index+Nx) - H(index)))/dz(index));
+    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index) + (sigmax/2)*(H(index+1) - H(index)))/dx(index));
     flux_n_old = - k_face(k_old,dz,index,Nx) * Kzz(index) * ( (H_old(index+Nx) - H_old(index))/dz(index));
     flux_e_old = - k_face(k_old,dx,index,1) * Kxx(index) * ( (H_old(index+1) - H_old(index))/dx(index));
 elseif i == 1 && j >=2 && j<= Nx-1
-    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
-    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index+1) - H(index))/dx(index));
+    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index) + (sigmaz/2)*(H(index+Nx) - H(index)))/dz(index));
+    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index) + (sigmax/2)*(H(index+1) - H(index)))/dx(index));
     flux_n_old = - k_face(k_old,dz,index,Nx) * Kzz(index) * ( (H_old(index+Nx) - H_old(index))/dz(index));
     flux_e_old = - k_face(k_old,dx,index,1) * Kxx(index) * ( (H_old(index+1) - H_old(index))/dx(index));
 elseif  i == 1 && j == Nx
     flux_e = Calc_CSGBound(z(index),h(index),Kxx(index),t,t_on_CSG);
     flux_e_old= Calc_CSGBound(z(index),h_old(index),Kxx(index),t,t_on_CSG);
-    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
-    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - H(index))/dx(index-1));
+    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index) + (sigmaz/2)*(H(index+Nx) - H(index)))/dz(index));
+    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - (sigmax/2)*(H(index-1) - H(index)))/dx(index-1));
     flux_n_old = - k_face(k_old,dz,index,Nx) * Kzz(index) * ( (H_old(index+Nx) - H_old(index))/dz(index));
     flux_w_old = - k_face(k_old,dx,index,-1) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
 elseif i >= 2 &&i <= Nz-1 && j ==1
@@ -78,9 +79,9 @@ elseif i >= 2 &&i <= Nz-1 && j ==1
         flux_w = Calc_RiverBound(z(index),h(index),simple);
         flux_w_old = Calc_RiverBound(z(index),h_old(index),simple);
     end
-    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
-    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
-    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index+1) - H(index))/dx(index));
+    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index) + (sigmaz/2)*(H(index+Nx) - H(index)))/dz(index));
+    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - (sigmaz/2)*(H(index-Nx) - H(index)))/dz(index-Nx));
+    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index) + (sigmax/2)*(H(index+1) - H(index)))/dx(index));
     flux_n_old = - k_face(k_old,dz,index,Nx) * Kzz(index) * ( (H_old(index+Nx) - H_old(index))/dz(index));
     flux_s_old = - k_face(k_old,dz,index,-Nx) * Kzz(index) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
     flux_e_old = - k_face(k_old,dx,index,1) * Kxx(index) * ( (H_old(index+1) - H_old(index))/dx(index));
@@ -89,35 +90,35 @@ elseif i >=2 && i<=Nz-1 && j==Nx
         flux_e = Calc_CSGBound(z(index),h(index),Kxx(index),t,t_on_CSG);
         flux_e_old = Calc_CSGBound(z(index),h_old(index),Kxx(index),t,t_on_CSG);
     end
-    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index+Nx) - H(index))/dz(index));
-    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - H(index))/dx(index-1));
-    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
+    flux_n = - k_face(k_new,dz,index,Nx) * Kzz(index) * ( (H(index) + (sigmaz/2)*(H(index+Nx) - H(index)))/dz(index));
+    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - (sigmax/2)*(H(index-1) - H(index)))/dx(index-1));
+    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - (sigmaz/2)*(H(index-Nx) - H(index)))/dz(index-Nx));
     flux_n_old = - k_face(k_old,dz,index,Nx) * Kzz(index) * ( (H_old(index+Nx) - H_old(index))/dz(index));
     flux_w_old = - k_face(k_old,dx,index,-1) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
     flux_s_old = - k_face(k_old,dz,index,-Nx) * Kzz(index) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
 elseif i == Nz && j == 1
     flux_w = Calc_RiverBound(z(index),h(index),simple);
     flux_w_old = Calc_RiverBound(z(index),h_old(index),simple);
-    flux_n = Calc_RainBound(t,h(index),DELTAX(index),simple,prediction_data);
-    flux_n_old = Calc_RainBound(t_old,h_old(index),DELTAX(index),simple,prediction_data);
-    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
-    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index+1) - H(index))/dx(index));
+    flux_n = Calc_RainBound(t,h(index),DELTAX(index));
+    flux_n_old = Calc_RainBound(t_old,h_old(index),DELTAX(index));
+    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - (sigmaz/2)*(H(index-Nx) - H(index)))/dz(index-Nx));
+    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index) + (sigmax/2)*(H(index+1) - H(index)))/dx(index));
     flux_s_old = - k_face(k_old,dz,index,-Nx) * Kzz(index) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
     flux_e_old = - k_face(k_old,dx,index,1) * Kxx(index) * ( (H_old(index+1) - H_old(index))/dx(index));
 elseif i == Nz && j >=2 && j<= Nx-1
-    flux_n = Calc_RainBound(t,h(index),DELTAX(index),simple,prediction_data);
-    flux_n_old = Calc_RainBound(t_old,h_old(index),DELTAX(index),simple,prediction_data);
-    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
+    flux_n = Calc_RainBound(t,h(index),DELTAX(index));
+    flux_n_old = Calc_RainBound(t_old,h_old(index),DELTAX(index));
+    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - (sigmaz/2)*(H(index-Nx) - H(index)))/dz(index-Nx));
     flux_s_old = - k_face(k_old,dz,index,-Nx) * Kzz(index) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
-    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - H(index))/dx(index-1));
-    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index+1) - H(index))/dx(index));
+    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - (sigmax/2)*(H(index-1) - H(index)))/dx(index-1));
+    flux_e = - k_face(k_new,dx,index,1)* Kxx(index) * ( (H(index) + (sigmax/2)*(H(index+1) - H(index)))/dx(index));
     flux_w_old = - k_face(k_old,dx,index,-1) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
     flux_e_old = - k_face(k_old,dx,index,1) * Kxx(index) * ( (H_old(index+1) - H_old(index))/dx(index));
 elseif i == Nz && j == Nx
-    flux_n = Calc_RainBound(t,h(index),DELTAX(index),simple,prediction_data);
-    flux_n_old = Calc_RainBound(t_old,h_old(index),DELTAX(index),simple,prediction_data);
-    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - H(index))/dx(index-1));
-    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - H(index))/dz(index-Nx));
+    flux_n = Calc_RainBound(t,h(index),DELTAX(index));
+    flux_n_old = Calc_RainBound(t_old,h_old(index),DELTAX(index));
+    flux_w = - k_face(k_new,dx,index,-1) * Kxx(index) * ( (H(index-1) - (sigmax/2)*(H(index-1) - H(index)))/dx(index-1));
+    flux_s = - k_face(k_new,dz,index,-Nx)* Kzz(index) * ( (H(index-Nx) - (sigmaz/2)*(H(index-Nx) - H(index)))/dz(index-Nx));
     flux_w_old = - k_face(k_old,dx,index,-1) * Kxx(index) * ( (H_old(index-1) - H_old(index))/dx(index-1));
     flux_s_old = - k_face(k_old,dz,index,-Nx) * Kzz(index) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
 end
