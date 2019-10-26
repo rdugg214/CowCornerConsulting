@@ -159,13 +159,13 @@ for i = 1:Nz
 end
 m = 1 - (1./n);
 
-n(:) = mean(n);
-m(:) = mean(m);
-psi_res(:) = mean(psi_res);
-psi_sat(:) = mean(psi_sat);
-Kxx(:) = mean(Kxx);
-Kzz(:) = mean(Kzz);
-alpha(:) = mean(alpha);
+% n(:) = mean(n);
+% m(:) = mean(m);
+% psi_res(:) = mean(psi_res);
+% psi_sat(:) = mean(psi_sat);
+% Kxx(:) = mean(Kxx);
+% Kzz(:) = mean(Kzz);
+% alpha(:) = mean(alpha);
 % n(:) = n(2);
 % m(:) = m(2);
 % psi_res(:) = psi_res(2);
