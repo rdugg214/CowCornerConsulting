@@ -9,22 +9,13 @@ dx =50; dz = 2; %distance between nodes
 nx = 21; ny = 11;  %number of nodes
 geometric = [dx dz]; %uniform progression
 % geometric = [1 nx ny]; %geometric progression
-simple = 1; %river and evap off
-SAVEVID = 1;
+simple = 1; %1 if river, evap and complex rain on.
+SAVEVID = 1; %Set 1 if want a video to save, 0 otherwise
 
-
+%default simulation parameters
 DEF = v2struct(dtmax, endtime, t_on_CSG,t_on_PUMP,geometric, simple,Pr,SAVEVID);
-% %% Run at uniform only rain and pumping
-% SET = DEF;
-% SET.endtime = 2*365;
-% SimpleSolution(SET)
-% %%
-% SET = DEF;
-% SET.simple = 1;
-% SimpleSolution(SET)
+
 %%
 SET = DEF;
 SET.simple = 1;
 SimpleSolution(SET)
-
-%%
