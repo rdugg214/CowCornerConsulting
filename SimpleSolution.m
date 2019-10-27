@@ -6,6 +6,7 @@ v2struct(SET);
 Lx = 500;
 Lz = 100;
 dt_o = 2;
+
 %% Generate a uniform mesh with N node points
 if length(geometric) == 3
     % Complex Mesh with each regions modelled seperately. 
@@ -208,7 +209,7 @@ psi_guess_func = @(t) psi_int + -(t.*(-1.803e-3)-sin(t.*pi.*(2.0./3.65e+2)).*1.0
     - ( ((Tarf * Pr)/((365)*(75-55)) ) *t )/(Lx*Lz);
 psi_guess =  psi_guess_func(t);
 psi_guess_hist = psi_av;
-%-----
+%----- capture outputs from flux
 riverloc = x == 0 & z>=80 & z<=100;
 CSGloc = x == 500 & z <= 5 & z >=0;
 rainloc = z ==100;
@@ -216,6 +217,16 @@ Ballocs = [riverloc';CSGloc';rainloc'];
 Balvals = zeros(size(Ballocs,1),1);
 Ballarr = Balvals;
 
+if SAVEVID
+movegui(figm,'onscreen');
+dname = char(datetime);
+dname(dname==' ') = '_'; dname = ['_',dname,'_'];
+dname(dname == ':') = '-';
+vidObj = VideoWriter([dname '.avi']);
+vidObj.Quality = 100;
+vidObj.FrameRate = 1;
+open(vidObj);
+end
 while t<endtime
     ftsuccess = true;
     success = false;
@@ -263,5 +274,11 @@ while t<endtime
    t_old = t;
    t = t+dt;
     drawnow
+    if SAVEVID
+        writeVideo(vidObj,getframe(gcf));
+    end
+end
+if SAVEVID
+ close(vidObj);
 end
 end

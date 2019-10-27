@@ -4,7 +4,7 @@ D = predictor_data(k)/365;
 
 d = mod(day,365);
 A = 0.9944;
-deviation = randn()+1.1714;
+deviation = 1.1714;
 prediction = scale*deviation * A * cos(2*pi*d/365) + D;
 
 if prediction < 0
