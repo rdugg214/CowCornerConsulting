@@ -160,13 +160,13 @@ for i = 1:Nz
 end
 m = 1 - (1./n);
 
-% n(:) = mean(n);
-% m(:) = mean(m);
-% psi_res(:) = mean(psi_res);
-% psi_sat(:) = mean(psi_sat);
-% Kxx(:) = mean(Kxx);
-% Kzz(:) = mean(Kzz);
-% alpha(:) = mean(alpha);
+n(:) = mean(n);
+m(:) = mean(m);
+psi_res(:) = mean(psi_res);
+psi_sat(:) = mean(psi_sat);
+Kxx(:) = mean(Kxx);
+Kzz(:) = mean(Kzz);
+alpha(:) = mean(alpha);
 % n(:) = n(2);
 % m(:) = m(2);
 % psi_res(:) = psi_res(2);
@@ -216,6 +216,7 @@ rainloc = z ==100;
 Ballocs = [riverloc';CSGloc';rainloc'];
 Balvals = zeros(size(Ballocs,1),1);
 Ballarr = Balvals;
+% Ballarr = 0;
 
 if SAVEVID
 movegui(figm,'onscreen');
