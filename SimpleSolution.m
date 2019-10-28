@@ -140,21 +140,21 @@ Kzz = zeros(size(x));
 for i = 1:Nz
     for j = 1:Nx
         index = (i-1)*Nx + j;
-        if hetgen.boundary(index)
-             Kxx(index) = mean(hetgen.Kxx(zonebin(index,:))); 
-            Kzz(index) =  mean(hetgen.Kzz(zonebin(index,:)));
-            psi_res(index) =  mean(hetgen.psi_res(zonebin(index,:)));
-            psi_sat(index) = mean(hetgen.psi_sat(zonebin(index,:))); 
-            alpha(index) = mean(hetgen.alpha(zonebin(index,:))); 
-            n(index) =  mean(hetgen.n(zonebin(index,:)));
-        else
-            Kxx(index) = hetgen.Kxx(zonebin(index,:)); 
-            Kzz(index) = hetgen.Kzz(zonebin(index,:));
-            psi_res(index) = hetgen.psi_res(zonebin(index,:));
-            psi_sat(index) =hetgen.psi_sat(zonebin(index,:)); 
-            alpha(index) =hetgen.alpha(zonebin(index,:)); 
-            n(index) = hetgen.n(zonebin(index,:));
-        end
+%         if hetgen.boundary(index)
+%              Kxx(index) = mean(hetgen.Kxx(zonebin(index,:))); 
+%             Kzz(index) =  mean(hetgen.Kzz(zonebin(index,:)));
+%             psi_res(index) =  mean(hetgen.psi_res(zonebin(index,:)));
+%             psi_sat(index) = mean(hetgen.psi_sat(zonebin(index,:))); 
+%             alpha(index) = mean(hetgen.alpha(zonebin(index,:))); 
+%             n(index) =  mean(hetgen.n(zonebin(index,:)));
+%         else
+            Kxx(index) = hetgen.Kxx(zonetype(index)); 
+            Kzz(index) = hetgen.Kzz(zonetype(index));
+            psi_res(index) = hetgen.psi_res(zonetype(index));
+            psi_sat(index) =hetgen.psi_sat(zonetype(index)); 
+            alpha(index) =hetgen.alpha(zonetype(index)); 
+            n(index) = hetgen.n(zonetype(index));
+%         end
           
     end
 end
@@ -232,19 +232,23 @@ while t<endtime
     success = false;
    
     while success == false
-    dt = omega*dt;
+     dt = omega*dt;
     t = t_old+dt;
     F = @(h) FVM(h,dt, t, t_old,h_old, params);
     Jacobian = @(F,x,Fx0) NEW_JacobianFD(F,x,Fx0,params,dt, t, t_old, h_old);
     [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, "Shamanskii");
     [~,hgain] =  FVM(h,dt, t, t_old,h_old, params);
-    if success == false;
+    if success == false
+     
         ftsuccess = false;
     fprintf('New dt = %3.2f\n',dt);
     end
     omega =0.5;
     end
-    dt = (dt/omega)/(omega*0.75);
+    if ftsuccess == true && (dt/omega)/omega <dtmax
+    dt = min(dtmax,(dt/omega)/omega);
+    fprintf('New dt = %3.8f\n',dt);
+    end
 %     if ftsuccess == true & (dt/omega)/omega <dtmax
 %     dt = min(dtmax,(dt/omega)/omega);
 %      fprintf('New dt = %3.8f\n',dt);
@@ -273,12 +277,20 @@ while t<endtime
    h_old = h;
    t_old = t;
    t = t+dt;
-    drawnow
+   drawnow
     if SAVEVID
         writeVideo(vidObj,getframe(gcf));
     end
+    
+     if t > 4*365
+   
+     error('TIMEEND!')
+     close(vidObj);
+     end
+     
 end
 if SAVEVID
  close(vidObj);
 end
+system('shutdown -s')
 end

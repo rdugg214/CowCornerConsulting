@@ -2,8 +2,8 @@
 clear, close all, clc
 dtmax = 360; % max time step
 endtime = 5*365; 
-t_on_CSG = 10*365; %time on of CSG 
-t_on_PUMP = 10*365; %time on of PUMP
+t_on_CSG = 5*365; %time on of CSG 
+t_on_PUMP = 5*365; %time on of PUMP
 Pr = 0.25; % Pumping rate 
 dx =50; dz = 2; %distance between nodes
 nx = 21; ny = 11;  %number of nodes
