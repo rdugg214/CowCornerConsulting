@@ -1,4 +1,4 @@
-function [] = SimpleSolution(SET)
+function [h] = SimpleSolution(SET)
 v2struct(SET);
 %% Simiple version of the problem
 % Solve the advection diffusion problem
@@ -23,8 +23,8 @@ nz = geometri(3);
 x = round(GP_sym(0,500,nx,1.3),4); z = round(GP_sym(0,100,ny,1.5),4);
 o_x = x; o_z = z;
 else 
-    dx = geometric(1);
-    dz = geometric(2);
+dx = geometric(1);
+dz = geometric(2);
 o_x = 0:dx:Lx;
 o_z = 0:dz:Lz;
 end
@@ -107,18 +107,18 @@ for i = 1:Nz
         end
         if  ((0 <= x(index) && x(index) <= 500) && (0 <= z(index) && z(index) <= 40))...
                 || ((350 < x(index) && x(index) <= 500) && (40 < z(index) && z(index) <= 50))
-            zonetype(index) = 2;
+            zonetype(index) = 3;
             zonebin(index,2) = 1;
         end
         if  ((50 < x(index) && x(index) <= 350) && (40 < z(index) && z(index) <= 50))
-            zonetype(index) = 3;
+            zonetype(index) = 2;
             zonebin(index,3) = 1;
         end
         if  ((300 < x(index) && x(index) <= 500) && (50 <= z(index) && z(index) <= 100))
             zonetype(index)=4;
             zonebin(index,4) = 1;
         end
-        end
+    end
 end
 zonebin = logical(zonebin);
 hetgen.boundary = sum(zonebin,2)>1;
@@ -140,40 +140,41 @@ Kzz = zeros(size(x));
 for i = 1:Nz
     for j = 1:Nx
         index = (i-1)*Nx + j;
-        if hetgen.boundary(index)
+         if hetgen.boundary(index)
              Kxx(index) = mean(hetgen.Kxx(zonebin(index,:))); 
-            Kzz(index) =  mean(hetgen.Kzz(zonebin(index,:)));
+            Kzz(index) = mean(hetgen.Kzz(zonebin(index,:)));
             psi_res(index) =  mean(hetgen.psi_res(zonebin(index,:)));
             psi_sat(index) = mean(hetgen.psi_sat(zonebin(index,:))); 
             alpha(index) = mean(hetgen.alpha(zonebin(index,:))); 
             n(index) =  mean(hetgen.n(zonebin(index,:)));
         else
-            Kxx(index) = hetgen.Kxx(zonebin(index,:)); 
-            Kzz(index) = hetgen.Kzz(zonebin(index,:));
-            psi_res(index) = hetgen.psi_res(zonebin(index,:));
-            psi_sat(index) =hetgen.psi_sat(zonebin(index,:)); 
-            alpha(index) =hetgen.alpha(zonebin(index,:)); 
-            n(index) = hetgen.n(zonebin(index,:));
+            Kxx(index) = hetgen.Kxx(zonetype(index)); 
+            Kzz(index) = hetgen.Kzz(zonetype(index));
+            psi_res(index) = hetgen.psi_res(zonetype(index));
+            psi_sat(index) =hetgen.psi_sat(zonetype(index)); 
+            alpha(index) =hetgen.alpha(zonetype(index)); 
+            n(index) = hetgen.n(zonetype(index));
         end
           
     end
 end
 m = 1 - (1./n);
 
-% n(:) = mean(n);
-% m(:) = mean(m);
-% psi_res(:) = mean(psi_res);
-% psi_sat(:) = mean(psi_sat);
-% Kxx(:) = mean(Kxx);
-% Kzz(:) = mean(Kzz);
-% alpha(:) = mean(alpha);
-% n(:) = n(2);
-% m(:) = m(2);
-% psi_res(:) = psi_res(2);
-% psi_sat(:) = psi_sat(2);
-% Kxx(:) = Kxx(2);
-% Kzz(:) = Kzz(2);
-% alpha(:) = alpha(2);
+n(:) = mean(n);
+m(:) = mean(m);
+psi_res(:) = mean(psi_res);
+psi_sat(:) = mean(psi_sat);
+Kxx(:) = mean(Kxx);
+Kzz(:) = mean(Kzz);
+alpha(:) = mean(alpha);
+% zind = 3;
+% n(:) = n(zind);
+% m(:) = m(zind);
+% psi_res(:) = psi_res(zind);
+% psi_sat(:) = psi_sat(zind);
+% Kxx(:) = Kxx(zind);
+% Kzz(:) = Kzz(zind);
+% alpha(:) = alpha(zind);
 load prediction_data.mat
 params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
     Kxx , Kzz , dx , dz, DELTAX, DELTAZ,t_on_CSG,t_on_PUMP, simple,Pr,hetgen,prediction_data};
@@ -182,12 +183,16 @@ params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
 h_old = zeros(size(x));
 hbot = -5;
 htop = -10;
+
 for i = 1:Nz
     for j = 1:Nx
         index = (i-1)*Nx + j;
         h_old(index) = hbot + ((htop - hbot)*z(index)/Lz);
     end
 end
+
+% hload = load('h_init.mat');
+% h_old = hload.h;
 
 %% LOOP!
 % Define static variables
@@ -210,12 +215,17 @@ psi_guess_func = @(t) psi_int + -(t.*(-1.803e-3)-sin(t.*pi.*(2.0./3.65e+2)).*1.0
 psi_guess =  psi_guess_func(t);
 psi_guess_hist = psi_av;
 %----- capture outputs from flux
-riverloc = x == 0 & z>=80 & z<=100;
-CSGloc = x == 500 & z <= 5 & z >=0;
+% riverloc = x == 0 & z>=80 & z<=100;
+% CSGloc = x == 500 & z <= 5 & z >=0;
+ riverloc = z >=80 & x ==0 ;
+ CSGloc = z <=5 & x ==500;
 rainloc = z ==100;
 Ballocs = [riverloc';CSGloc';rainloc'];
 Balvals = zeros(size(Ballocs,1),1);
 Ballarr = Balvals;
+% Ballarr = 0;
+
+helper_plotcmap(X,Z,helper_row2mat(Nz,Nx,zonetype),helper_row2mat(Nz,Nx,zonetype),figm);
 
 if SAVEVID
 movegui(figm,'onscreen');
@@ -232,19 +242,23 @@ while t<endtime
     success = false;
    
     while success == false
-    dt = omega*dt;
+     dt = omega*dt;
     t = t_old+dt;
     F = @(h) FVM(h,dt, t, t_old,h_old, params);
     Jacobian = @(F,x,Fx0) NEW_JacobianFD(F,x,Fx0,params,dt, t, t_old, h_old);
     [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, "Shamanskii");
     [~,hgain] =  FVM(h,dt, t, t_old,h_old, params);
-    if success == false;
+    if success == false
+     
         ftsuccess = false;
     fprintf('New dt = %3.2f\n',dt);
     end
     omega =0.5;
     end
-    dt = (dt/omega)/(omega*0.75);
+    if ftsuccess == true && (dt/omega)/omega <dtmax
+    dt = min(dtmax,(dt/omega)/omega);
+    fprintf('New dt = %3.8f\n',dt);
+    end
 %     if ftsuccess == true & (dt/omega)/omega <dtmax
 %     dt = min(dtmax,(dt/omega)/omega);
 %      fprintf('New dt = %3.8f\n',dt);
@@ -255,7 +269,7 @@ while t<endtime
     %
 %     Balvals = Balvals + [sum(hgain.w(Ballocs(1,:)).*DELTAZ(Ballocs(1,:))); ...
 %     sum(hgain.e(Ballocs(2,:)).*DELTAZ(Ballocs(2,:))) ];
-    Balvals = [sum(hgain.w(Ballocs(1,:))./DELTAX(Ballocs(1,:))); ...
+    Balvals = [sum(hgain.w' ./DELTAX(Ballocs(1,:))); ...
     sum(hgain.e(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
      sum(hgain.n(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
 %     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
@@ -267,16 +281,13 @@ while t<endtime
     psi_av_hist = [psi_av_hist psi_av];
     psi_guess =   psi_guess_func(t);
     psi_guess_hist = [psi_guess_hist psi_guess];
-   helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now./psi_sat,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr)
+   helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr)
    
    title(sprintf('t = %.2f (years) (current dt = %.2f (days))',t/365,dt));
    h_old = h;
    t_old = t;
    t = t+dt;
-   if t < 
-    drawnow
-     close(vidObj);
-     error('TIMEEND!')
+   drawnow
     if SAVEVID
         writeVideo(vidObj,getframe(gcf));
     end

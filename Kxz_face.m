@@ -6,9 +6,9 @@ function K_OUT = Kxz_face(Kxz,offset,index,boundary)
 
 % if ~boundary 
 % % K_OUT=Kxz(index+offset);
-K_OUT = Kxz(index);
+% K_OUT = Kxz(index);
 
 % else
-% K_OUT = ((Kxz(index+offset)+Kxz(index)))/2;
+K_OUT = ((Kxz(index+offset)+Kxz(index)))/2;
 % end
 end

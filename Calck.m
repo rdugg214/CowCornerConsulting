@@ -1,8 +1,5 @@
 function k = Calck(h, S, m,x,z,dx,dz,hetgen)
 %     k = ones(size(h));
-%     inner = Svec(i)(locs).*(1./mvec(i)(locs));
-%     innera = (1-inner);
-%     innerb = (1-innera).^(mvec(i)(locs));
 %   k(locs) = sqrt(Svec(i)(locs)) .* innerb.^2;
 %  k(locs) = sqrt(Svec(i)(locs)) .* (1 - (1 - Svec(i)(locs).^(1./mvec(i)(locs))).^(mvec(i)(locs))).^2;
     k = zeros(size(h));

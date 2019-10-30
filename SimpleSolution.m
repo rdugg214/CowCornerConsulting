@@ -5,7 +5,7 @@ v2struct(SET);
 % Problem setup
 Lx = 500;
 Lz = 100;
-dt_o = 2;
+dt_o = 3;
 
 %% Generate a uniform mesh with N node points
 if length(geometric) == 3
@@ -23,8 +23,8 @@ nz = geometri(3);
 x = round(GP_sym(0,500,nx,1.3),4); z = round(GP_sym(0,100,ny,1.5),4);
 o_x = x; o_z = z;
 else 
-    dx = geometric(1);
-    dz = geometric(2);
+dx = geometric(1);
+dz = geometric(2);
 o_x = 0:dx:Lx;
 o_z = 0:dz:Lz;
 end
@@ -118,7 +118,7 @@ for i = 1:Nz
             zonetype(index)=4;
             zonebin(index,4) = 1;
         end
-        end
+    end
 end
 zonebin = logical(zonebin);
 hetgen.boundary = sum(zonebin,2)>1;
@@ -183,14 +183,16 @@ params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
 h_old = zeros(size(x));
 hbot = -5;
 htop = -10;
+
 for i = 1:Nz
     for j = 1:Nx
         index = (i-1)*Nx + j;
         h_old(index) = hbot + ((htop - hbot)*z(index)/Lz);
     end
 end
-hload = load('h_init.mat');
-h_old = hload.h;
+
+% hload = load('h_init.mat');
+% h_old = hload.h;
 
 %% LOOP!
 % Define static variables
@@ -212,11 +214,10 @@ psi_guess_func = @(t) psi_int + -(t.*(-1.803e-3)-sin(t.*pi.*(2.0./3.65e+2)).*1.0
     - ( ((Tarf * Pr)/((365)*(75-55)) ) *t )/(Lx*Lz);
 psi_guess =  psi_guess_func(t);
 psi_guess_hist = psi_av;
+
 %----- capture outputs from flux
-% riverloc = x == 0 & z>=80 & z<=100;
-% CSGloc = x == 500 & z <= 5 & z >=0;
- riverloc = z >=80 & x ==0 ;
- CSGloc = z <=5 & x ==500;
+riverloc = z >=80 & x ==0 ;
+CSGloc = z <=5 & x ==500;
 rainloc = z ==100;
 Ballocs = [riverloc';CSGloc';rainloc'];
 Balvals = zeros(size(Ballocs,1),1);
@@ -240,38 +241,37 @@ while t<endtime
     success = false;
    
     while success == false
-     dt = omega*dt;
-    t = t_old+dt;
-    F = @(h) FVM(h,dt, t, t_old,h_old, params);
-    Jacobian = @(F,x,Fx0) NEW_JacobianFD(F,x,Fx0,params,dt, t, t_old, h_old);
-    [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, "Shamanskii");
-    [~,hgain] =  FVM(h,dt, t, t_old,h_old, params);
-    if success == false
-     
-        ftsuccess = false;
-    fprintf('New dt = %3.2f\n',dt);
-    end
-    omega =0.5;
+        dt = omega*dt;
+        t = t_old+dt;
+        F = @(h) FVM(h,dt, t, t_old,h_old, params);
+        Jacobian = @(F,x,Fx0) NEW_JacobianFD(F,x,Fx0,params,dt, t, t_old, h_old);
+        [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, "Shamanskii");
+        [~,hgain] =  FVM(h,dt, t, t_old,h_old, params);
+        if success == false
+            ftsuccess = false;
+            fprintf('New dt = %3.2f\n',dt);
+        end
+        omega =0.5;
     end
     if ftsuccess == true && (dt/omega)/omega <dtmax
-    dt = min(dtmax,(dt/omega)/omega);
-    fprintf('New dt = %3.8f\n',dt);
+        dt = min(dtmax,(dt/omega)/omega);
+        fprintf('New dt = %3.8f\n',dt);
     end
-%     if ftsuccess == true & (dt/omega)/omega <dtmax
-%     dt = min(dtmax,(dt/omega)/omega);
-%      fprintf('New dt = %3.8f\n',dt);
-%     end
+    %     if ftsuccess == true & (dt/omega)/omega <dtmax
+    %     dt = min(dtmax,(dt/omega)/omega);
+    %      fprintf('New dt = %3.8f\n',dt);
+    %     end
     fprintf('Success!\n')
     
     t_hist = [t_hist t];
     %
-%     Balvals = Balvals + [sum(hgain.w(Ballocs(1,:)).*DELTAZ(Ballocs(1,:))); ...
-%     sum(hgain.e(Ballocs(2,:)).*DELTAZ(Ballocs(2,:))) ];
+    %     Balvals = Balvals + [sum(hgain.w(Ballocs(1,:)).*DELTAZ(Ballocs(1,:))); ...
+    %     sum(hgain.e(Ballocs(2,:)).*DELTAZ(Ballocs(2,:))) ];
     Balvals = [sum(hgain.w' ./DELTAX(Ballocs(1,:))); ...
-    sum(hgain.e(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
-     sum(hgain.n(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
-%     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
-     Ballarr(:,end+1) =   Balvals;
+        sum(hgain.e(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
+        sum(hgain.n(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
+    %     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
+    Ballarr(:,end+1) =   Balvals;
     % comparison average vs current
     psi_old = psi_now;
     psi_now = helper_getpsinow(h, alpha,n,m,psi_res,psi_sat,x,z,dx,dz,hetgen);
@@ -279,13 +279,13 @@ while t<endtime
     psi_av_hist = [psi_av_hist psi_av];
     psi_guess =   psi_guess_func(t);
     psi_guess_hist = [psi_guess_hist psi_guess];
-   helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr)
-   
-   title(sprintf('t = %.2f (years) (current dt = %.2f (days))',t/365,dt));
-   h_old = h;
-   t_old = t;
-   t = t+dt;
-   drawnow
+    helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr,simple)
+    
+    title(sprintf('t = %.2f (years) (current dt = %.2f (days))',t/365,dt));
+    h_old = h;
+    t_old = t;
+    t = t+dt;
+    drawnow
     if SAVEVID
         writeVideo(vidObj,getframe(gcf));
     end

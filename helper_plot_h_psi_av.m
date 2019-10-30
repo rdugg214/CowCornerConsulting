@@ -1,4 +1,4 @@
-function helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr)
+function helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr,simple)
 
 
  MAT_h = helper_row2mat(Nz,Nx,h) ;
@@ -11,7 +11,9 @@ function helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_gu
    
     hold on
     plot(t_hist,psi_av_hist,'Color','r');
+    if simple
      plot(t_hist,psi_guess_hist,'Color','b');
+    end
      
      
       subplot(1,4,4)
