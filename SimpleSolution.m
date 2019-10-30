@@ -140,40 +140,41 @@ Kzz = zeros(size(x));
 for i = 1:Nz
     for j = 1:Nx
         index = (i-1)*Nx + j;
-%         if hetgen.boundary(index)
-%              Kxx(index) = mean(hetgen.Kxx(zonebin(index,:))); 
-%             Kzz(index) =  mean(hetgen.Kzz(zonebin(index,:)));
-%             psi_res(index) =  mean(hetgen.psi_res(zonebin(index,:)));
-%             psi_sat(index) = mean(hetgen.psi_sat(zonebin(index,:))); 
-%             alpha(index) = mean(hetgen.alpha(zonebin(index,:))); 
-%             n(index) =  mean(hetgen.n(zonebin(index,:)));
-%         else
+         if hetgen.boundary(index)
+             Kxx(index) = mean(hetgen.Kxx(zonebin(index,:))); 
+            Kzz(index) = mean(hetgen.Kzz(zonebin(index,:)));
+            psi_res(index) =  mean(hetgen.psi_res(zonebin(index,:)));
+            psi_sat(index) = mean(hetgen.psi_sat(zonebin(index,:))); 
+            alpha(index) = mean(hetgen.alpha(zonebin(index,:))); 
+            n(index) =  mean(hetgen.n(zonebin(index,:)));
+        else
             Kxx(index) = hetgen.Kxx(zonetype(index)); 
             Kzz(index) = hetgen.Kzz(zonetype(index));
             psi_res(index) = hetgen.psi_res(zonetype(index));
             psi_sat(index) =hetgen.psi_sat(zonetype(index)); 
             alpha(index) =hetgen.alpha(zonetype(index)); 
             n(index) = hetgen.n(zonetype(index));
-%         end
+        end
           
     end
 end
 m = 1 - (1./n);
 
-n(:) = mean(n);
-m(:) = mean(m);
-psi_res(:) = mean(psi_res);
-psi_sat(:) = mean(psi_sat);
-Kxx(:) = mean(Kxx);
-Kzz(:) = mean(Kzz);
-alpha(:) = mean(alpha);
-% n(:) = n(2);
-% m(:) = m(2);
-% psi_res(:) = psi_res(2);
-% psi_sat(:) = psi_sat(2);
-% Kxx(:) = Kxx(2);
-% Kzz(:) = Kzz(2);
-% alpha(:) = alpha(2);
+% n(:) = mean(n);
+% m(:) = mean(m);
+% psi_res(:) = mean(psi_res);
+% psi_sat(:) = mean(psi_sat);
+% Kxx(:) = mean(Kxx);
+% Kzz(:) = mean(Kzz);
+% alpha(:) = mean(alpha);
+% zind = 3;
+% n(:) = n(zind);
+% m(:) = m(zind);
+% psi_res(:) = psi_res(zind);
+% psi_sat(:) = psi_sat(zind);
+% Kxx(:) = Kxx(zind);
+% Kzz(:) = Kzz(zind);
+% alpha(:) = alpha(zind);
 load prediction_data.mat
 params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
     Kxx , Kzz , dx , dz, DELTAX, DELTAZ,t_on_CSG,t_on_PUMP, simple,Pr,hetgen,prediction_data};
@@ -210,13 +211,17 @@ psi_guess_func = @(t) psi_int + -(t.*(-1.803e-3)-sin(t.*pi.*(2.0./3.65e+2)).*1.0
 psi_guess =  psi_guess_func(t);
 psi_guess_hist = psi_av;
 %----- capture outputs from flux
-riverloc = x == 0 & z>=80 & z<=100;
-CSGloc = x == 500 & z <= 5 & z >=0;
+% riverloc = x == 0 & z>=80 & z<=100;
+% CSGloc = x == 500 & z <= 5 & z >=0;
+ riverloc = z == 40 & x >350;
+ CSGloc = z == 60 & x >350;
 rainloc = z ==100;
 Ballocs = [riverloc';CSGloc';rainloc'];
 Balvals = zeros(size(Ballocs,1),1);
 Ballarr = Balvals;
 % Ballarr = 0;
+
+% helper_plotcmap(X,Z,helper_row2mat(Nz,Nx,zonetype),helper_row2mat(Nz,Nx,zonetype),figm);
 
 if SAVEVID
 movegui(figm,'onscreen');
@@ -260,8 +265,8 @@ while t<endtime
     %
 %     Balvals = Balvals + [sum(hgain.w(Ballocs(1,:)).*DELTAZ(Ballocs(1,:))); ...
 %     sum(hgain.e(Ballocs(2,:)).*DELTAZ(Ballocs(2,:))) ];
-    Balvals = [sum(hgain.w(Ballocs(1,:))./DELTAX(Ballocs(1,:))); ...
-    sum(hgain.e(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
+    Balvals = [sum(hgain.n(Ballocs(1,:))./DELTAX(Ballocs(1,:))); ...
+    sum(hgain.n(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
      sum(hgain.n(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
 %     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
      Ballarr(:,end+1) =   Balvals;
@@ -282,16 +287,8 @@ while t<endtime
     if SAVEVID
         writeVideo(vidObj,getframe(gcf));
     end
-    
-     if t > 4*365
-   
-     error('TIMEEND!')
-     close(vidObj);
-     end
-     
 end
 if SAVEVID
  close(vidObj);
 end
-system('shutdown -s')
 end

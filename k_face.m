@@ -1,6 +1,6 @@
 function k_out = k_face(k,d,index,offset)
 
-sigma = 0;
+sigma = 1;
 % k_out = ((k(index+offset) + k(index))/2); %arithmetic average
 i = index+offset;
 if offset == 1
