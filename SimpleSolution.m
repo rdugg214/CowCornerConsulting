@@ -107,11 +107,11 @@ for i = 1:Nz
         end
         if  ((0 <= x(index) && x(index) <= 500) && (0 <= z(index) && z(index) <= 40))...
                 || ((350 < x(index) && x(index) <= 500) && (40 < z(index) && z(index) <= 50))
-            zonetype(index) = 2;
+            zonetype(index) = 3;
             zonebin(index,2) = 1;
         end
         if  ((50 < x(index) && x(index) <= 350) && (40 < z(index) && z(index) <= 50))
-            zonetype(index) = 3;
+            zonetype(index) = 2;
             zonebin(index,3) = 1;
         end
         if  ((300 < x(index) && x(index) <= 500) && (50 <= z(index) && z(index) <= 100))
@@ -221,7 +221,7 @@ Balvals = zeros(size(Ballocs,1),1);
 Ballarr = Balvals;
 % Ballarr = 0;
 
-% helper_plotcmap(X,Z,helper_row2mat(Nz,Nx,zonetype),helper_row2mat(Nz,Nx,zonetype),figm);
+helper_plotcmap(X,Z,helper_row2mat(Nz,Nx,zonetype),helper_row2mat(Nz,Nx,zonetype),figm);
 
 if SAVEVID
 movegui(figm,'onscreen');
@@ -267,7 +267,7 @@ while t<endtime
 %     sum(hgain.e(Ballocs(2,:)).*DELTAZ(Ballocs(2,:))) ];
     Balvals = [sum(hgain.n(Ballocs(1,:))./DELTAX(Ballocs(1,:))); ...
     sum(hgain.n(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
-     sum(hgain.n(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
+     sum(hgain.s(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
 %     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
      Ballarr(:,end+1) =   Balvals;
     % comparison average vs current
@@ -277,7 +277,7 @@ while t<endtime
     psi_av_hist = [psi_av_hist psi_av];
     psi_guess =   psi_guess_func(t);
     psi_guess_hist = [psi_guess_hist psi_guess];
-   helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now./psi_sat,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr)
+   helper_plot_h_psi_av(Nz,Nx,figm,X,Z,hgain.n,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr)
    
    title(sprintf('t = %.2f (years) (current dt = %.2f (days))',t/365,dt));
    h_old = h;
