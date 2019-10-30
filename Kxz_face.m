@@ -9,6 +9,6 @@ function K_OUT = Kxz_face(Kxz,offset,index,boundary)
 K_OUT = Kxz(index);
 
 % else
-% K_OUT = abs((Kxz(index+offset)+Kxz(index)))/2;
+% K_OUT = ((Kxz(index+offset)+Kxz(index)))/2;
 % end
 end

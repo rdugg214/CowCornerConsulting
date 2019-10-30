@@ -131,12 +131,7 @@ elseif i == Nz && j == Nx % Top Right
     flux_w_old = - k_face(k_old,dx,index,-1) * Kxz_face(Kxx,-1,index,hetgen.boundary(index)) * ( (H_old(index-1) - H_old(index))/dx(index-1));
     flux_s_old = - k_face(k_old,dz,index,-Nx) *Kxz_face(Kzz,-Nx,index,hetgen.boundary(index)) * ( (H_old(index-Nx) - H_old(index))/dz(index-Nx));
 end
-if z(index) == 60 & x(index) == 400 & t > 3*365
-   disp("test") ;
-end
-if z(index) == 40 & x(index) == 400 & t > 3*365
-   disp("test") ;
-end
+
 F = psi_new(index) - psi_old(index) + ...
     theta * dt * (((1/DELTAX(index)) * (flux_e + ...
     flux_w)) + ((1/DELTAZ(index)) * (flux_n + ...

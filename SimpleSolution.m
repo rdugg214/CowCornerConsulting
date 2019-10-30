@@ -1,4 +1,4 @@
-function [] = SimpleSolution(SET)
+function [h] = SimpleSolution(SET)
 v2struct(SET);
 %% Simiple version of the problem
 % Solve the advection diffusion problem
@@ -160,13 +160,13 @@ for i = 1:Nz
 end
 m = 1 - (1./n);
 
-% n(:) = mean(n);
-% m(:) = mean(m);
-% psi_res(:) = mean(psi_res);
-% psi_sat(:) = mean(psi_sat);
-% Kxx(:) = mean(Kxx);
-% Kzz(:) = mean(Kzz);
-% alpha(:) = mean(alpha);
+n(:) = mean(n);
+m(:) = mean(m);
+psi_res(:) = mean(psi_res);
+psi_sat(:) = mean(psi_sat);
+Kxx(:) = mean(Kxx);
+Kzz(:) = mean(Kzz);
+alpha(:) = mean(alpha);
 % zind = 3;
 % n(:) = n(zind);
 % m(:) = m(zind);
@@ -189,6 +189,8 @@ for i = 1:Nz
         h_old(index) = hbot + ((htop - hbot)*z(index)/Lz);
     end
 end
+hload = load('h_init.mat');
+h_old = hload.h;
 
 %% LOOP!
 % Define static variables
@@ -213,8 +215,8 @@ psi_guess_hist = psi_av;
 %----- capture outputs from flux
 % riverloc = x == 0 & z>=80 & z<=100;
 % CSGloc = x == 500 & z <= 5 & z >=0;
- riverloc = z == 40 & x >350;
- CSGloc = z == 60 & x >350;
+ riverloc = z >=80 & x ==0 ;
+ CSGloc = z <=5 & x ==500;
 rainloc = z ==100;
 Ballocs = [riverloc';CSGloc';rainloc'];
 Balvals = zeros(size(Ballocs,1),1);
@@ -265,9 +267,9 @@ while t<endtime
     %
 %     Balvals = Balvals + [sum(hgain.w(Ballocs(1,:)).*DELTAZ(Ballocs(1,:))); ...
 %     sum(hgain.e(Ballocs(2,:)).*DELTAZ(Ballocs(2,:))) ];
-    Balvals = [sum(hgain.n(Ballocs(1,:))./DELTAX(Ballocs(1,:))); ...
-    sum(hgain.n(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
-     sum(hgain.s(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
+    Balvals = [sum(hgain.w' ./DELTAX(Ballocs(1,:))); ...
+    sum(hgain.e(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
+     sum(hgain.n(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
 %     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
      Ballarr(:,end+1) =   Balvals;
     % comparison average vs current
@@ -277,7 +279,7 @@ while t<endtime
     psi_av_hist = [psi_av_hist psi_av];
     psi_guess =   psi_guess_func(t);
     psi_guess_hist = [psi_guess_hist psi_guess];
-   helper_plot_h_psi_av(Nz,Nx,figm,X,Z,hgain.n,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr)
+   helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr)
    
    title(sprintf('t = %.2f (years) (current dt = %.2f (days))',t/365,dt));
    h_old = h;

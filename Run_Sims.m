@@ -1,9 +1,9 @@
 % parameters 
 clear, close all, clc
 dtmax = 3720; % max time step
-endtime = 50*365; 
-t_on_CSG = 50*365; %time on of CSG 
-t_on_PUMP = 50*365; %time on of PUMP
+endtime = 10*365; 
+t_on_CSG = 4*365; %time on of CSG 
+t_on_PUMP = 4*365; %time on of PUMP
 Pr = 0.25; % Pumping rate 
 dx =50; dz =5; %distance between nodes
 nx = 21; ny = 11;  %number of nodes
@@ -17,5 +17,5 @@ DEF = v2struct(dtmax, endtime, t_on_CSG,t_on_PUMP,geometric, simple,Pr,SAVEVID);
 
 %%
 SET = DEF;
-SET.simple = 1;
-SimpleSolution(SET)
+SET.simple =0 ;
+h = SimpleSolution(SET)
