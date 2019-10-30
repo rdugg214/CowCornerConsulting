@@ -1,4 +1,4 @@
-function [x_out,success] = NEW_Newton_Solver(F,x0,Jacobian, type)
+function [x_out,success] = NEW_Newton_Solver(F,x0,Jacobian, type, Method)
 %% Inexact Newton
 success = true;
 tola = 1e-5;
@@ -14,9 +14,10 @@ preverr = 0;
 maxerr = 1e0;
 err =Inf;
 if (type ~= "Full Newton")
-    J = Jacobian(F,x,Resid);  
+    J = Jacobian(F,x,Resid);
+    M = Find_Precon_Mat(J, "ILU", 5);
 end
-Method = "GMRES Test";
+% Method = "GMRES";
 k = 0;
 while err > tol && k < MaxIters
     if CalculateJacobian(type, k, m, err, preverr)
@@ -27,7 +28,7 @@ while err > tol && k < MaxIters
         dx = J\(-Resid);
     else 
     
-        dx = IanGMRES(J,-Resid,x,M,tol,20,0);
+        dx = My_GMRES(J,-Resid,x,M,tol,20,0);
     end
     lambda = 1;
     alpha = 1e-2;

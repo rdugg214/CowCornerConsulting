@@ -236,7 +236,21 @@ while t<endtime
     t = t_old+dt;
     F = @(h) FVM(h,dt, t, t_old,h_old, params);
     Jacobian = @(F,x,Fx0) NEW_JacobianFD(F,x,Fx0,params,dt, t, t_old, h_old);
-    [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, "Shamanskii");
+    [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, "Shamanskii", "GMRES");
+    % Plotting Times
+    type_names = ["Full Newton", "Chord", "Shamanskii"];
+    method_names = ["Normal", "GMRES"];
+    method_times = zeros(2, 3);
+    for i = 1:3
+        for j = 1:2
+            tic;
+            [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, type_names(i), method_names(j));
+            method_times(j, i) = toc;
+        end
+        
+    end
+    break;
+    % Normal code
     [~,hgain] =  FVM(h,dt, t, t_old,h_old, params);
     if success == false
      
@@ -245,6 +259,7 @@ while t<endtime
     end
     omega =0.5;
     end
+    break;
     if ftsuccess == true && (dt/omega)/omega <dtmax
     dt = min(dtmax,(dt/omega)/omega);
     fprintf('New dt = %3.8f\n',dt);
@@ -289,8 +304,17 @@ while t<endtime
      end
      
 end
-if SAVEVID
- close(vidObj);
-end
-system('shutdown -s')
+figure;
+method_times = [method_times(1, :), method_times(2, :)];
+b = bar(method_times);
+b.FaceColor = 'flat';
+b.CData(1:3,:) = [1 0 0; 1 0 0; 1 0 0];
+set(gca,'xticklabel',{"Blackslash Full Newton", "Blackslash Chord", "Blackslash Shamanskii", "GMRES Full Newton", "GMRES Chord", "GMRES Shamanskii"});
+title("Time to execute by newton solver method");
+ylabel("Time (s)");
+xtickangle(45);
+% if SAVEVID
+%  close(vidObj);
+% end
+% system('shutdown -s')
 end
