@@ -1,10 +1,10 @@
 % parameters 
 clear, close all, clc
 dtmax = 100; % max time step
-endtime = 30*365; 
-t_on_CSG = 500*365; %time on of CSG 
-t_on_PUMP = 500*365; %time on of PUMP
-Pr = 0.25; % Pumping rate 
+endtime = 20*365; 
+t_on_CSG = 30*365; %time on of CSG 
+t_on_PUMP = 30*365; %time on of PUMP
+Pr = 0.5; % Pumping rate 
 DELCSG = 5000;
 dx =50; dz =10; %distance between nodes
 nx = 21; ny = 11;  %number of nodes
@@ -29,4 +29,4 @@ RES = SimpleSolution(SET)
 %%
 h = RES.h_final;
 %% save
-save('RES.mat','RES')
+% save('RES.mat','RES')
