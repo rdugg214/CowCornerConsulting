@@ -24,8 +24,8 @@ hetgen = params{21};
 prediction_data = params{22};
 
 
-S_new = CalcS(h, alpha, n, m);
-S_old = CalcS(h_old, alpha, n, m);
+S_new = CalcS(h, alpha, n, m,x,z,dx,dz,hetgen);
+S_old = CalcS(h_old, alpha, n, m,x,z,dx,dz,hetgen);
 
 
 k_new = Calck(h, S_new, m,x,z,dx,dz,hetgen);

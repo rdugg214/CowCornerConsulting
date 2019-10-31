@@ -1,2 +1,0 @@
-
-leftbordernodes = A(:,1);

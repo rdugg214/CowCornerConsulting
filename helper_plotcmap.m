@@ -16,7 +16,7 @@ colorbar
     shading interp
     view(2)
     axis([0 500 0 100])
-%    caxis([0 1])
+   caxis([0 1])
   
  
 colorbar

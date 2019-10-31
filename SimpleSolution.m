@@ -140,33 +140,33 @@ Kzz = zeros(size(x));
 for i = 1:Nz
     for j = 1:Nx
         index = (i-1)*Nx + j;
-         if hetgen.boundary(index)
-             Kxx(index) = mean(hetgen.Kxx(zonebin(index,:))); 
-            Kzz(index) = mean(hetgen.Kzz(zonebin(index,:)));
-            psi_res(index) =  mean(hetgen.psi_res(zonebin(index,:)));
-            psi_sat(index) = mean(hetgen.psi_sat(zonebin(index,:))); 
-            alpha(index) = mean(hetgen.alpha(zonebin(index,:))); 
-            n(index) =  mean(hetgen.n(zonebin(index,:)));
-        else
+%          if hetgen.boundary(index)
+%              Kxx(index) = mean(hetgen.Kxx(zonebin(index,:))); 
+%             Kzz(index) = mean(hetgen.Kzz(zonebin(index,:)));
+%             psi_res(index) =  mean(hetgen.psi_res(zonebin(index,:)));
+%             psi_sat(index) = mean(hetgen.psi_sat(zonebin(index,:))); 
+%             alpha(index) = mean(hetgen.alpha(zonebin(index,:))); 
+%             n(index) =  mean(hetgen.n(zonebin(index,:)));
+%         else
             Kxx(index) = hetgen.Kxx(zonetype(index)); 
             Kzz(index) = hetgen.Kzz(zonetype(index));
             psi_res(index) = hetgen.psi_res(zonetype(index));
             psi_sat(index) =hetgen.psi_sat(zonetype(index)); 
             alpha(index) =hetgen.alpha(zonetype(index)); 
             n(index) = hetgen.n(zonetype(index));
-        end
+%         end
           
     end
 end
 m = 1 - (1./n);
 
-n(:) = mean(n);
-m(:) = mean(m);
-psi_res(:) = mean(psi_res);
-psi_sat(:) = mean(psi_sat);
-Kxx(:) = mean(Kxx);
-Kzz(:) = mean(Kzz);
-alpha(:) = mean(alpha);
+% n(:) = mean(n);
+% m(:) = mean(m);
+% psi_res(:) = mean(psi_res);
+% psi_sat(:) = mean(psi_sat);
+% Kxx(:) = mean(Kxx);
+% Kzz(:) = mean(Kzz);
+% alpha(:) = mean(alpha);
 % zind = 3;
 % n(:) = n(zind);
 % m(:) = m(zind);
@@ -279,7 +279,7 @@ while t<endtime
     psi_av_hist = [psi_av_hist psi_av];
     psi_guess =   psi_guess_func(t);
     psi_guess_hist = [psi_guess_hist psi_guess];
-    helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr,simple)
+    helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now./psi_sat,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr,simple)
     
     title(sprintf('t = %.2f (years) (current dt = %.2f (days))',t/365,dt));
     h_old = h;

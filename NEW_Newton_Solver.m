@@ -26,7 +26,7 @@ while err > tol && k < MaxIters
     if Method == "Normal"
         dx = J\(-Resid);
     else 
-        dx = IanGMRES(J,-Resid,x,M,tol,20,0);
+        dx = GMRES(J,-Resid,x,M,tol,20,0);
     end
     lambda = 1;
     alpha = 1e-2;

@@ -24,8 +24,8 @@ hetgen = params{21};
 prediction_data = params{22};
 
 
-S_new = CalcS(h, alpha, n, m);
-S_old = CalcS(h_old, alpha, n, m);
+S_new = CalcS(h, alpha, n, m,x,z,dx,dz,hetgen);
+S_old = CalcS(h_old, alpha, n, m,x,z,dx,dz,hetgen);
 
 
 k_new = Calck(h, S_new, m,x,z,dx,dz,hetgen);
@@ -52,6 +52,7 @@ F = zeros(size(h));
 for i = 2:Nz-1
     for j = 2:Nx-1
         index = (i-1)*Nx + j;
+        if i == 2 || i == Nx-1 || j == 2 || j == 
         flux_n(index) = -k_face(k_new,dz,index,Nx) * Kxz_face(Kzz,Nx,index,hetgen.boundary(index)) * ((H(index+Nx) - H(index))/dz(index));
         flux_e(index) = -k_face(k_new,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((H(index+1) - H(index))/dx(index));
         flux_n_old(index) = -k_face(k_old,dz,index,Nx) * Kxz_face(Kzz,Nx,index,hetgen.boundary(index)) * ((H_old(index+Nx) - H_old(index))/dz(index));
@@ -114,7 +115,7 @@ for i = 2:Nz-1
         index = (i-1)*Nx + j;
         
         flux_n(index) = -k_face(k_new,dz,index,Nx) * Kxz_face(Kzz,Nx,index,hetgen.boundary(index)) * ((H(index+Nx) - H(index))/dz(index));
-        flux_e(index) = -k_face(k_new,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((h(index+1) - h(index))/dx(index));
+        flux_e(index) = -k_face(k_new,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((H(index+1) - H(index))/dx(index));
         flux_n_old(index) = -k_face(k_old,dz,index,Nx) * Kxz_face(Kzz,Nx,index,hetgen.boundary(index)) * ((H_old(index+Nx) - H_old(index))/dz(index));
         flux_e_old(index) = -k_face(k_old,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((H_old(index+1) - H_old(index))/dx(index));
         
@@ -172,8 +173,8 @@ for i = Nz
         flux_w_old(rint) =  Calc_RiverBound(z(index),h_old(index),simple);
         flux_n(index) = Calc_RainBound(t,h(index),DELTAX(index),simple,prediction_data);
         flux_n_old(index) = Calc_RainBound(t_old,h_old(index),DELTAX(index),simple,prediction_data);
-        flux_e(index) = -k_face(k_new,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((h(index+1) - h(index))/dx(index));
-        flux_e_old(index) = -k_face(k_old,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((h_old(index+1) - h_old(index))/dx(index));
+        flux_e(index) = -k_face(k_new,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((H(index+1) - H(index))/dx(index));
+        flux_e_old(index) = -k_face(k_old,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((H_old(index+1) - H_old(index))/dx(index));
         
         F(index) = psi_new(index) - psi_old(index) + ...
             theta * dt * (1/DELTAX(index) * (flux_e(index) - ...
@@ -190,8 +191,8 @@ for i = Nz
         index = (i-1)*Nx + j;
         flux_n(index) = Calc_RainBound(t,h(index),DELTAX(index),simple,prediction_data);
         flux_n_old(index) = Calc_RainBound(t_old,h_old(index),DELTAX(index),simple,prediction_data);
-        flux_e(index) = -k_face(k_new,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((h(index+1) - h(index))/dx(index));
-        flux_e_old(index) = -k_face(k_old,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((h_old(index+1) - h_old(index))/dx(index));
+        flux_e(index) = -k_face(k_new,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((H(index+1) - H(index))/dx(index));
+        flux_e_old(index) = -k_face(k_old,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((H_old(index+1) - H_old(index))/dx(index));
         F(index) = psi_new(index) - psi_old(index) + ...
             theta * dt * (1/DELTAX(index) * (flux_e(index) - ...
             flux_e(index-1)) + 1/DELTAZ(index) * (flux_n(index) - ...
