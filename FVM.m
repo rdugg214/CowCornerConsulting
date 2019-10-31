@@ -1,4 +1,4 @@
- function [F,h_gain] = FVM(h,dt, t, t_old,h_old, params)
+function [F,h_gain] = FVM(h,dt, t, t_old,h_old, k_old, psi_old, Q_old, params)
 % Parameters IN
 N = params{1};          %value
 Nx = params{2};         %value
@@ -26,17 +26,17 @@ DELCSG = params{23};
 
 
 S_new = CalcS(h, alpha, n, m,x,z,dx,dz,hetgen);
-S_old = CalcS(h_old, alpha, n, m,x,z,dx,dz,hetgen);
+% S_old = CalcS(h_old, alpha, n, m,x,z,dx,dz,hetgen);
 
 
 k_new = Calck(h, S_new, m,x,z,dx,dz,hetgen);
-k_old = Calck(h_old, S_old, m,x,z,dx,dz,hetgen);
+% k_old = Calck(h_old, S_old, m,x,z,dx,dz,hetgen);
 
 psi_new = CalcPsi(h, S_new, psi_res, psi_sat,x,z,dx,dz,hetgen);
-psi_old = CalcPsi(h_old, S_old, psi_res, psi_sat,x,z,dx,dz,hetgen);
+% psi_old = CalcPsi(h_old, S_old, psi_res, psi_sat,x,z,dx,dz,hetgen);
 
 [Q,Kzz]=  Calc_Q(h,x,z,dt,psi_new,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr,prediction_data); %To be updated
-Q_old =  Calc_Q(h_old,x,z,dt,psi_old,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr,prediction_data);
+% Q_old =  Calc_Q(h_old,x,z,dt,psi_old,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr,prediction_data);
 theta = 0.5;
 H = h+z;
 H_old = h_old + z;

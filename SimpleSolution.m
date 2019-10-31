@@ -245,6 +245,7 @@ vidObj2.Quality = 100;
 vidObj2.FrameRate = 1;
 open(vidObj2);
 end
+t_vector = [t];
 while t<endtime
     ftsuccess = true;
     success = false;
@@ -252,17 +253,18 @@ while t<endtime
     while success == false
         dt = omega*dt;
         t = t_old+dt;
-        F = @(h) FVM(h,dt, t, t_old,h_old, params);
+        [k_old, psi_old, Q_old, ~] = FVM_pre_calcs(h_old, dt, t, params);
+        F = @(h) FVM(h,dt, t, t_old,h_old, k_old, psi_old, Q_old, params);
         Jacobian = @(F,x,Fx0) NEW_JacobianFD(F,x,Fx0,params,dt, t, t_old, h_old);
-        
         [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, "Shamanskii");
-        [~,hgain] =  FVM(h,dt, t, t_old,h_old, params);
+        [~,hgain] =  FVM(h,dt, t, t_old,h_old, k_old, psi_old, Q_old, params);
         if success == false
             ftsuccess = false;
             fprintf('Current dt = %3.2f\n',dt);
         end
         omega =0.5;
     end
+    t_vector(length(t_vector)+1) = t;
     if ftsuccess == true && (dt/omega)/omega <dtmax
         dt = min(dtmax,(dt/omega)/omega);
         fprintf('Current dt = %3.8f\n',dt);
@@ -317,5 +319,6 @@ RES.DELCSG = DELCSG;
 RES.Pr =Pr;
 RES.Harr = Harr;
 RES.geometric = geometric;
+RES.t_vector = t_vector;
 
 end

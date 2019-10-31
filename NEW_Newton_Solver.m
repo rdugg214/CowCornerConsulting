@@ -60,5 +60,5 @@ while err > tol && k < MaxIters
     end
 end
 
-
 x_out = x;
+end
