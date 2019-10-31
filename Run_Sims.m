@@ -1,7 +1,7 @@
 % parameters 
 clear, close all, clc
 dtmax = 100; % max time step
-endtime = 20*365; 
+endtime = 21*365; 
 t_on_CSG = 30*365; %time on of CSG 
 t_on_PUMP = 30*365; %time on of PUMP
 Pr = 0.5; % Pumping rate 

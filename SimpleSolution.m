@@ -222,7 +222,7 @@ pumploc = x==100  & 55 <= z & z<= 75;
 Ballocs = [riverloc';CSGloc';rainloc';evaploc';pumploc'];
 Balvals = zeros(size(Ballocs,1),1);
 Ballarr = Balvals;
-
+Harr =1/(Lx*Lz) * sum(h_old+z);
 
 % helper_plotcmap(X,Z,helper_row2mat(Nz,Nx,zonetype),helper_row2mat(Nz,Nx,zonetype),figm);
 
@@ -276,9 +276,6 @@ while t<endtime
     fprintf('Success!\n')
     
     t_hist = [t_hist t];
-    %
-    %     Balvals = Balvals + [sum(hgain.w(Ballocs(1,:)).*DELTAZ(Ballocs(1,:))); ...
-    %     sum(hgain.e(Ballocs(2,:)).*DELTAZ(Ballocs(2,:))) ];
     Balvals = [sum(hgain.w'); ...
         sum(hgain.e(Ballocs(2,:)));...
         sum(hgain.n(Ballocs(3,:)));...
@@ -286,6 +283,7 @@ while t<endtime
         sum(hgain.Q(Ballocs(5,:)))];
     %     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
     Ballarr(:,end+1) =   Balvals;
+    Harr(1,end+1) = 1/(Lx*Lz) * sum(h+z);
     % comparison average vs current
     psi_old = psi_now;
     psi_now = helper_getpsinow(h, alpha,n,m,psi_res,psi_sat,x,z,dx,dz,hetgen);
@@ -317,6 +315,7 @@ RES.t_on_CSG = t_on_CSG;
 RES.t_on_PUMP = t_on_PUMP;
 RES.DELCSG = DELCSG;
 RES.Pr =Pr;
+RES.Harr = Harr;
 RES.geometric = geometric;
 
 end
