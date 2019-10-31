@@ -15,13 +15,14 @@ Kzz = params{12};       %vector size h
 dx = params{13};        %vector size h
 dz = params{14};        %vector size h
 DELTAX =  params{15};   %vector size h
-DELTAZ = params{16};    %vector size h
+DELTAZ = params{16};    %vector size ;
 t_on_CSG = params{17};
 t_on_PUMP = params{18};
 simple = params{19};
 Pr = params{20};
 hetgen = params{21};
 prediction_data = params{22};
+DELCSG = params{23};
 
 
 S_new = CalcS(h, alpha, n, m,x,z,dx,dz,hetgen);
@@ -34,8 +35,8 @@ k_old = Calck(h_old, S_old, m,x,z,dx,dz,hetgen);
 psi_new = CalcPsi(h, S_new, psi_res, psi_sat,x,z,dx,dz,hetgen);
 psi_old = CalcPsi(h_old, S_old, psi_res, psi_sat,x,z,dx,dz,hetgen);
 
-[Q,Kzz]=  Calc_Q(h,x,z,dt,psi_new,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr); %To be updated
-Q_old =  Calc_Q(h_old,x,z,dt,psi_old,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr);
+[Q,Kzz]=  Calc_Q(h,x,z,dt,psi_new,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr,prediction_data); %To be updated
+Q_old =  Calc_Q(h_old,x,z,dt,psi_old,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr,prediction_data);
 theta = 0.5;
 H = h+z;
 H_old = h_old + z;
@@ -94,8 +95,8 @@ end
 for i = 1
     for j = Nx
         index = (i-1)*Nx + j;
-        flux_e(index) = Calc_CSGBound(z(index),h(index),Kxx(index),t,t_on_CSG);
-        flux_e_old(index)= Calc_CSGBound(z(index),h_old(index),Kxx(index),t_old,t_on_CSG);
+        flux_e(index) = Calc_CSGBound(z(index),h(index),Kxx(index),t,t_on_CSG,DELCSG);
+        flux_e_old(index)= Calc_CSGBound(z(index),h_old(index),Kxx(index),t_old,t_on_CSG,DELCSG);
         
         flux_n(index) = -k_face(k_new,dz,index,Nx) * Kxz_face(Kzz,Nx,index,hetgen.boundary(index)) * ((H(index+Nx) - H(index))/dz(index));
         flux_n_old(index) = -k_face(k_old,dz,index,Nx) * Kxz_face(Kzz,Nx,index,hetgen.boundary(index)) * ((H_old(index+Nx) - H_old(index))/dz(index));
@@ -146,9 +147,9 @@ end
 for i = 2:Nz-1
     for j = Nx
         index = (i-1)*Nx + j;
-        if 0 < z(index) && z(index) <= 40
-            flux_e(index) = Calc_CSGBound(z(index),h(index),Kxx(index),t,t_on_CSG);
-            flux_e_old(index) = Calc_CSGBound(z(index),h_old(index),Kxx(index),t_old,t_on_CSG);
+        if 0 < z(index) && z(index) <= 5
+            flux_e(index) = Calc_CSGBound(z(index),h(index),Kxx(index),t,t_on_CSG,DELCSG);
+            flux_e_old(index) = Calc_CSGBound(z(index),h_old(index),Kxx(index),t_old,t_on_CSG,DELCSG);
         end
         flux_n(index) = -k_face(k_new,dz,index,Nx) * Kxz_face(Kzz,Nx,index,hetgen.boundary(index)) * ((H(index+Nx) - H(index))/dz(index));
         flux_n_old(index) = -k_face(k_old,dz,index,Nx) * Kxz_face(Kzz,Nx,index,hetgen.boundary(index)) * ((H_old(index+Nx) - H_old(index))/dz(index));
@@ -332,6 +333,6 @@ h_gain.n = flux_n ;
 h_gain.e = flux_e ;
 % h_gain.s = flux_s ;
 h_gain.w = flux_w ;
-h_gain.Q = Q-Q_old;
+h_gain.Q = Q;
 
 end

@@ -1,4 +1,4 @@
-function [h] = SimpleSolution(SET)
+function [RES] = SimpleSolution(SET)
 v2struct(SET);
 %% Simiple version of the problem
 % Solve the advection diffusion problem
@@ -167,20 +167,14 @@ m = 1 - (1./n);
 % Kxx(:) = mean(Kxx);
 % Kzz(:) = mean(Kzz);
 % alpha(:) = mean(alpha);
-% zind = 3;
-% n(:) = n(zind);
-% m(:) = m(zind);
-% psi_res(:) = psi_res(zind);
-% psi_sat(:) = psi_sat(zind);
-% Kxx(:) = Kxx(zind);
-% Kzz(:) = Kzz(zind);
-% alpha(:) = alpha(zind);
-load prediction_data.mat
+
+load('prediction_data.mat')
 params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
-    Kxx , Kzz , dx , dz, DELTAX, DELTAZ,t_on_CSG,t_on_PUMP, simple,Pr,hetgen,prediction_data};
+    Kxx , Kzz , dx , dz, DELTAX, DELTAZ,t_on_CSG,t_on_PUMP, simple,Pr,hetgen,prediction_data,DELCSG};
 
 %% Generate Initial Solution
 h_old = zeros(size(x));
+if length(h_init) == 0
 hbot = -5;
 htop = -10;
 
@@ -190,24 +184,26 @@ for i = 1:Nz
         h_old(index) = hbot + ((htop - hbot)*z(index)/Lz);
     end
 end
-
-% hload = load('h_init.mat');
-% h_old = hload.h;
+else
+    h_old = h_init;
+end
 
 %% LOOP!
 % Define static variables
-t =0;
-t_old = 0;
+t =t_init;
+t_old = t_init;
 h = h_old;
-figm = figure('units','normalized','outerposition',[0.2 0.3 0.8 0.7]);
+figm = figure('units','normalized','outerposition',[0.2 0.5 0.8 0.5]);
+figb = figure('units','normalized','outerposition',[0.2 0.05 0.8 0.4]);
 omega = 1;
 dt = dt_o;
-t_hist = 0;
+t_hist = t_init;
 
 %---- plot average vs current
 psi_now = helper_getpsinow(h_old, alpha,n,m,psi_res,psi_sat,x,z,dx,dz,hetgen);
 psi_av  = 1/(Lx*Lz) * sum(DELTAX.*DELTAZ.*psi_now);
 psi_av_hist = psi_av;
+
 psi_int = psi_av;
 Tarf =0.6544;
 psi_guess_func = @(t) psi_int + -(t.*(-1.803e-3)-sin(t.*pi.*(2.0./3.65e+2)).*1.047390722740609e-1)/Lz...
@@ -219,22 +215,35 @@ psi_guess_hist = psi_av;
 riverloc = z >=80 & x ==0 ;
 CSGloc = z <=5 & x ==500;
 rainloc = z ==100;
-Ballocs = [riverloc';CSGloc';rainloc'];
+evaploc = ((50<=x & x <= 100) & (85 <= z & z<= 100))...
+    |  ((100<=x & x <= 300) & (95 <= z & z<= 100)) ...
+     | ((300<=x & x <= 500) & (90 <= z & z<= 100));
+pumploc = x==100  & 55 <= z & z<= 75;
+Ballocs = [riverloc';CSGloc';rainloc';evaploc';pumploc'];
 Balvals = zeros(size(Ballocs,1),1);
 Ballarr = Balvals;
-% Ballarr = 0;
 
-helper_plotcmap(X,Z,helper_row2mat(Nz,Nx,zonetype),helper_row2mat(Nz,Nx,zonetype),figm);
+
+% helper_plotcmap(X,Z,helper_row2mat(Nz,Nx,zonetype),helper_row2mat(Nz,Nx,zonetype),figm);
 
 if SAVEVID
-movegui(figm,'onscreen');
-dname = char(datetime);
-dname(dname==' ') = '_'; dname = ['_',dname,'_'];
+movegui(figb,'onscreen');
+dname_o = char(datetime);
+dname = dname_o;
+dname(dname==' ') = '_'; dname = ['_',dname,'_','GRAPH'];
 dname(dname == ':') = '-';
 vidObj = VideoWriter([dname '.avi']);
 vidObj.Quality = 100;
 vidObj.FrameRate = 1;
 open(vidObj);
+movegui(figm,'onscreen');
+dname = dname_o;
+dname(dname==' ') = '_'; dname = ['_',dname,'_','CMAP'];
+dname(dname == ':') = '-';
+vidObj2 = VideoWriter([dname '.avi']);
+vidObj2.Quality = 100;
+vidObj2.FrameRate = 1;
+open(vidObj2);
 end
 while t<endtime
     ftsuccess = true;
@@ -245,17 +254,20 @@ while t<endtime
         t = t_old+dt;
         F = @(h) FVM(h,dt, t, t_old,h_old, params);
         Jacobian = @(F,x,Fx0) NEW_JacobianFD(F,x,Fx0,params,dt, t, t_old, h_old);
+        
         [h,success] = NEW_Newton_Solver(F,h_old,Jacobian, "Shamanskii");
         [~,hgain] =  FVM(h,dt, t, t_old,h_old, params);
         if success == false
             ftsuccess = false;
-            fprintf('New dt = %3.2f\n',dt);
+            fprintf('Current dt = %3.2f\n',dt);
         end
         omega =0.5;
     end
     if ftsuccess == true && (dt/omega)/omega <dtmax
         dt = min(dtmax,(dt/omega)/omega);
-        fprintf('New dt = %3.8f\n',dt);
+        fprintf('Current dt = %3.8f\n',dt);
+    else
+        fprintf('Current dt = %3.8f\n',dt);
     end
     %     if ftsuccess == true & (dt/omega)/omega <dtmax
     %     dt = min(dtmax,(dt/omega)/omega);
@@ -267,9 +279,11 @@ while t<endtime
     %
     %     Balvals = Balvals + [sum(hgain.w(Ballocs(1,:)).*DELTAZ(Ballocs(1,:))); ...
     %     sum(hgain.e(Ballocs(2,:)).*DELTAZ(Ballocs(2,:))) ];
-    Balvals = [sum(hgain.w' ./DELTAX(Ballocs(1,:))); ...
-        sum(hgain.e(Ballocs(2,:))./DELTAX(Ballocs(2,:)));...
-        sum(hgain.n(Ballocs(3,:)) ./DELTAZ(Ballocs(3,:)))];
+    Balvals = [sum(hgain.w'); ...
+        sum(hgain.e(Ballocs(2,:)));...
+        sum(hgain.n(Ballocs(3,:)));...
+        sum(hgain.Q(Ballocs(4,:)));...
+        sum(hgain.Q(Ballocs(5,:)))];
     %     Ballarr(:,end+1) = Ballarr(:,end) +  Balvals;
     Ballarr(:,end+1) =   Balvals;
     % comparison average vs current
@@ -279,18 +293,30 @@ while t<endtime
     psi_av_hist = [psi_av_hist psi_av];
     psi_guess =   psi_guess_func(t);
     psi_guess_hist = [psi_guess_hist psi_guess];
-    helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now./psi_sat,h,t_hist,psi_av_hist,psi_guess_hist,Ballarr,simple)
-    
-    title(sprintf('t = %.2f (years) (current dt = %.2f (days))',t/365,dt));
+    helper_plot_h_psi_av(Nz,Nx,figm,X,Z,psi_now./psi_sat,h,t_hist,psi_av_hist,psi_guess_hist,t,dt,simple,DELCSG,Pr)
+    helper_plot_Ballarr(t_hist,Ballarr,figb,DELCSG,Pr,t,dt);
+   
     h_old = h;
     t_old = t;
     t = t+dt;
     drawnow
     if SAVEVID
-        writeVideo(vidObj,getframe(gcf));
+        writeVideo(vidObj,getframe(figb));
+        writeVideo(vidObj2,getframe(figm));
     end
 end
 if SAVEVID
  close(vidObj);
+  close(vidObj2);
 end
+RES.h_final = h;
+RES.Ballarr = Ballarr;
+RES.psi_av_hist = psi_av_hist;
+RES.t_final = t;
+RES.t_on_CSG = t_on_CSG;
+RES.t_on_PUMP = t_on_PUMP;
+RES.DELCSG = DELCSG;
+RES.Pr =Pr;
+RES.geometric = geometric;
+
 end
