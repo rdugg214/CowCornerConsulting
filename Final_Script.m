@@ -40,8 +40,9 @@ run_sim_drought_csg2 = 0;
 run_sim_drought_csg3 = 0;
 
 
-if run_sim_Rain_Test
+
 %% Compare with Analytical Rain and Pumping
+if run_sim_Rain_Test
 SET = DEF;
 SET.simple =1;
 SET.rain = 1;
@@ -57,9 +58,10 @@ else
 load('RES_Rain_Test.mat')
 end
 
-if run_sim_full_run
 %% Running simulation normal rainfall: Running up to 20 years
 %default simulation parameters
+
+if run_sim_full_run
 SET = DEF;
 SET.simple =0;
 SET.endtime = 21*365;
@@ -151,7 +153,7 @@ if run_sim_drought_csg0
 close all
 SET = DEF;
 r = load('RES.mat');
-SET.h_init = [];
+SET.h_init =1;
 SET.t_init = 20*365;
 SET.endtime = 50*365;
 SET.t_on_CSG = Inf;
@@ -166,7 +168,7 @@ save('RES_drought_csg0.mat','RES_drought_csg0')
 else
 load('RES_drought_csg0.mat') 
 end
-
+% 
 %% Running simulation drought rainfall at location 1
 if run_sim_drought_csg1
 SET = DEF;
@@ -228,30 +230,3 @@ load('RES_drought_csg3.mat')
 end
 
 
-
-% figure();
-% hold on;
-% plot(RES_rain_nocsg.t_vector, RES_rain_nocsg.Ballarr(1, :), 'r-');
-% plot(RES_rain_csg1.t_vector, RES_rain_csg1.Ballarr(1, :), 'r--');
-% plot(RES_drought_nocsg.t_vector, RES_drought_nocsg.Ballarr(1, :), 'b-');
-% plot(RES_drought_csg1.t_vector, RES_drought_csg1.Ballarr(1, :), 'b--');
-% legend("Normal Rainfall - No CSG", "Normal Rainfall - CSG 1", "Drought - No CSG", "Drought - CSG 1")
-% title("Flux From River");
-% xlabel("Time (Days)");
-% ylabel("Flux")
-
-
-%%
-% load('RES.mat')
-% close all
-% figure();
-% hold on;
-% % plot(RES_rain_nocsg.t_vector, RES_rain_nocsg.Harr, 'r-');
-% plot(RES_rain_csg0.t_vector+RES.t_final, RES_rain_csg0.meanHarr, 'k','LineWidth',4);
-% plot(RES_rain_csg1.t_vector+RES.t_final, RES_rain_csg1.meanHarr, 'r','LineWidth',1);
-% plot(RES_rain_csg2.t_vector+RES.t_final, RES_rain_csg2.meanHarr, 'b','LineWidth',3);
-% plot(RES_rain_csg3.t_vector+RES.t_final, RES_rain_csg3.meanHarr, 'g','LineWidth',3);
-% legend("No CSG", "CSG 1km", "CSG 5km", "CSG 10km")
-% title("Water table height over time for Normal Rainflal");
-% xlabel("Time (Days)");
-% ylabel("Water table height (m)")

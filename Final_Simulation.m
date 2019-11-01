@@ -238,7 +238,7 @@ if length(h_init) == 0 %Standard initial values
     end
 elseif length(h_init) == 1 %Saturated initial values
     hbot = 95;
-    htop = -1;
+    htop = -2;
     for i = 1:Nz
         for j = 1:Nx
             index = (i-1)*Nx + j;
