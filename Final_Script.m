@@ -47,7 +47,7 @@ SET.simple =1;
 SET.rain = 1;
 SET.t_on_CSG = Inf;
 SET.t_on_PUMP = 0;
-SET.endtime = 1*365;
+SET.endtime = 10*365;
 SET.SAVEVID = 1;
 SET.NAME = 'RES_Rain_Test';
 % Run Simulation
@@ -77,8 +77,8 @@ end
 if run_sim_normal_csg0
 SET = DEF;
 SET.h_init = 1;
-SET.t_init = r.RES.t_final;
-SET.endtime = 40*365;
+SET.t_init = 20*365;
+SET.endtime = 50*365;
 SET.t_on_CSG = Inf;
 SET.t_on_PUMP = 0*365;
 SET.DELCSG = Inf; 
@@ -96,8 +96,8 @@ if run_sim_normal_csg1
 SET = DEF;
 r = load('RES.mat');
 SET.h_init = 1;
-SET.t_init = r.RES.t_final;
-SET.endtime = 40*365;
+SET.t_init = 20*365;
+SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
 SET.t_on_PUMP = 0*365;
 SET.DELCSG = 1000; 
@@ -114,8 +114,8 @@ if run_sim_normal_csg2
 SET = DEF;
 r = load('RES.mat');
 SET.h_init = 1;
-SET.t_init = r.RES.t_final;
-SET.endtime = 40*365;
+SET.t_init = 20*365;
+SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
 SET.t_on_PUMP = 0*365;
 SET.DELCSG = 2500; 
@@ -132,8 +132,8 @@ if run_sim_normal_csg3
 SET = DEF;
 r = load('RES.mat');
 SET.h_init = 1;
-SET.t_init = r.RES.t_final;
-SET.endtime = 40*365;
+SET.t_init = 20*365;
+SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
 SET.t_on_PUMP = 0*365;
 SET.DELCSG = 5000; 
@@ -152,9 +152,8 @@ close all
 SET = DEF;
 r = load('RES.mat');
 SET.h_init = [];
-% SET.t_init = r.RES.t_final;
-SET.t_init = 21.9*365;
-SET.endtime = 40*365;
+SET.t_init = 20*365;
+SET.endtime = 50*365;
 SET.t_on_CSG = Inf;
 SET.rain = 3;
 SET.t_on_PUMP = 0*365;
@@ -173,8 +172,8 @@ if run_sim_drought_csg1
 SET = DEF;
 r = load('RES.mat');
 SET.h_init = 1;
-SET.t_init = r.RES.t_final;
-SET.endtime = 40*365;
+SET.t_init = 20*365;
+SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
 SET.rain = 3;
 SET.t_on_PUMP = 0*365;
@@ -193,8 +192,8 @@ if run_sim_drought_csg2
 SET = DEF;
 r = load('RES.mat');
 SET.h_init = 1;
-SET.t_init = r.RES.t_final;
-SET.endtime = 40*365;
+SET.t_init = 20*365;
+SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
 SET.rain = 3;
 SET.t_on_PUMP = 0*365;
@@ -213,8 +212,8 @@ if run_sim_drought_csg3
 SET = DEF;
 r = load('RES.mat');
 SET.h_init = 1;
-SET.t_init = r.RES.t_final;
-SET.endtime = 40*365;
+SET.t_init = 20*365;
+SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
 SET.t_on_PUMP = 0*365;
 SET.rain = 3;
