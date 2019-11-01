@@ -167,16 +167,22 @@ m = 1 - (1./n);
 % Kxx(:) = mean(Kxx);
 % Kzz(:) = mean(Kzz);
 % alpha(:) = mean(alpha);
+if rain == 3
+    load('prediction_data_drought.mat')
+    prediction_data = prediction_data_drought;
+else
+    load('prediction_data.mat')
+end
+    
 
-load('prediction_data.mat')
 params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
-    Kxx , Kzz , dx , dz, DELTAX, DELTAZ,t_on_CSG,t_on_PUMP, simple,Pr,hetgen,prediction_data,DELCSG};
+    Kxx , Kzz , dx , dz, DELTAX, DELTAZ,t_on_CSG,t_on_PUMP, simple,Pr,hetgen,prediction_data,DELCSG,rain};
 
 %% Generate Initial Solution
 h_old = zeros(size(x));
 if length(h_init) == 0
-hbot = -5;
-htop = -10;
+hbot = 90;
+htop = -1;
 
 for i = 1:Nz
     for j = 1:Nx
