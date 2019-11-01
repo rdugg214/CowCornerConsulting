@@ -1,8 +1,4 @@
-<<<<<<< HEAD:My_GMRES.m
-function [x,m] = My_GMRES(A,b,x0,M,tol,MaxKrylov,diagnostics)
-=======
 function [x,m] = GMRES(A,b,x0,M,tol,MaxKrylov,diagnostics)
->>>>>>> 3a85df01975395b6882a6dde125b70aa5f468ba0:GMRES.m
 
 N = size(A,1);
 H = zeros(MaxKrylov+1,MaxKrylov);

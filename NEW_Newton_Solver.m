@@ -49,7 +49,6 @@ while err > tol && k < MaxIters
         Fxt_norm = norm(F(xt),1)^2;
         line_search_count = line_search_count + 1;
     end
-%     fprintf('Line search took %d iterations to complete \n', line_search_count);
     x = xt;
     k = k + 1;
     Resid = F(x);
