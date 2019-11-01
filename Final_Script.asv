@@ -12,34 +12,29 @@ dtmax = 180; % max time step
 endtime = 21*365;
 Pr = 0.5; % Pumping rate
 dx =50; dz =2; %distance between nodes
-nx = 11; nz = 31;  %number of nodes
-% geometric = [dx dz]; %uniform progression
-geometric = [1 nx nz]; %geometric progression
+nx = 21; ny = 11;  %number of nodes
+geometric = [dx dz]; %uniform progression
+% geometric = [1 nx ny]; %geometric progression
 SAVEVID = 0; %Set 1 if want a video to save, 0 otherwise
 t_on_CSG = 2000*365; %time on of CSG 
 t_on_PUMP = 2000*365; %time on of PUMP
 DELCSG = 5000;
 simple = 1; %1 if river, evap and complex rain on.
-rain = 2; %0 - no rain, 1 - simple, 2 - complex rain, 3-complex drought rain
+rain = 1; %0 - no rain, 1 - simple, 2 - complex rain, 3-complex drought rain
 h_init = [];
 t_init = 0;
 % r = load('RES.mat');
 % h_init = r.RES.h_final;
 % t_init = r.RES.t_final;
 DEF = v2struct(dtmax, endtime, t_on_CSG,t_on_PUMP,geometric, simple,Pr,SAVEVID,DELCSG,h_init,t_init,rain);
-%% Compare with Analytical Rain and Pumping
+% %% Compare with Analytical Rain and Pumping
 % SET = DEF;
-% r = load('RES.mat');
-% SET.h_init = r.RES.h_final;
-% SET.t_init = r.RES.t_final;
 % SET.simple =1;
 % SET.t_on_PUMP = 0;
-% SET.t_on_PUMP = 0;
-% SET.endtime = 40*365;
+% SET.endtime = 5*365;
 % SET.SAVEVID = 0;
 % % Run Simulation
 % RES_Rain_Test = SimpleSolution(SET);
-%%
 % 
 % %% Running simulation normal  rainfall without CSG
 % 
@@ -61,17 +56,18 @@ DEF = v2struct(dtmax, endtime, t_on_CSG,t_on_PUMP,geometric, simple,Pr,SAVEVID,D
 %% Running simulation normal rainfall with CSG at distance 1
 close all
 SET = DEF;
-% r = load('RES.mat');
-% SET.h_init = r.RES.h_final;
-% SET.t_init = r.RES.t_final;
+r = load('RES.mat');
+SET.h_init = r.RES.h_final;
+SET.t_init = r.RES.t_final;
 SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
-SET.t_on_PUMP = 50*365;
+SET.t_on_PUMP = 0*365;
 SET.Pr= 0.25;
 SET.DELCSG = 1000; 
 SET.dtmax = 20;
 SET.simple =0;
 %default simulation parameters
+
 
 % Run Simulation
 RES_rain_csg1 = SimpleSolution(SET);
@@ -84,7 +80,7 @@ SET.h_init = r.RES.h_final;
 SET.t_init = r.RES.t_final;
 SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
-SET.t_on_PUMP =  50*365;
+SET.t_on_PUMP = 0*365;
 SET.Pr= 0.25;
 SET.DELCSG = 5000; 
 SET.dtmax = 20;
@@ -93,7 +89,7 @@ SET.simple =0;
 
 
 % Run Simulation
-RES_rain_csg2 = SimpleSolution(SET);
+RES_rain_csg1 = SimpleSolution(SET);
 
 %% Running simulation normal rainfall with CSG at distance 3
 close all
@@ -103,7 +99,7 @@ SET.h_init = r.RES.h_final;
 SET.t_init = r.RES.t_final;
 SET.endtime = 50*365;
 SET.t_on_CSG = 0*365;
-SET.t_on_PUMP = 50*365;
+SET.t_on_PUMP = 5*365;
 SET.Pr= 0.25;
 SET.DELCSG = 10000; 
 SET.dtmax = 20;
@@ -112,7 +108,7 @@ SET.simple =0;
 
 
 % Run Simulation
-RES_rain_csg3 = SimpleSolution(SET);
+RES_rain_csg1 = SimpleSolution(SET);
 
 %% Running simulation drought rainfall with CSG at distance 1
 t_on_CSG = 30*365; %time on of CSG 

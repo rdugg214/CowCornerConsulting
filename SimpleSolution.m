@@ -9,18 +9,20 @@ dt_o = 3;
 
 %% Generate a uniform mesh with N node points
 if length(geometric) == 3
-    % Complex Mesh with each regions modelled seperately. 
+%     Complex Mesh with each regions modelled seperately. 
+nx = geometric(2);
+nz = geometric(3);
+x1 = GP_sym(0,50,ceil(nx/10),1.01); x2 = GP_sym(50,300,ceil(5*nx/10),1.02); x3 = GP_sym(300,350,ceil(3*nx/10),1.02);  x4 = GP_sym(350,500,ceil(1*nx/10),1.02);
 
-% x1 = GP_sym(0,50,50/2,1.01); x2 = GP_sym(50,300,250/2,1.02); x3 = GP_sym(300,350,50/2,1.02);  x4 = GP_sym(350,500,150/2,1.02);
-% 
 % z1 = GP_sym(0,5,10/2,1.05);  z2 = GP_sym(5,40,35/2,1.05); z3 = GP_sym(40,50,10/2,1.03); z4 = GP_sym(50,80,30/2,1.05); z5 = GP_sym(80,100,20/2,1.05); 
+z1 = GP_sym(0,5,ceil(nz/10),1.05);  z2 = GP_sym(5,40,ceil(3*nz/10),1.05); z3 = GP_sym(40,50,ceil(nz/10),1.03); z4 = GP_sym(50,80,ceil(3*nz/10),1.05); z5 = GP_sym(80,100,ceil(2*nz/10),1.05); 
 
-% x=[x1(1:end-1),x2(1:end-1),x3(1:end-1),x4]; z = [z1(1:end-1),z2(1:end-1),z3(1:end-1),z4(1:end-1),z5];
+x=[x1(1:end-1),x2(1:end-1),x3(1:end-1),x4]; z = [z1(1:end-1),z2(1:end-1),z3(1:end-1),z4(1:end-1),z5];
+
 
 % Simple Mesh with geometric progression
-nx = geometric(2);
-nz = geometri(3);
-x = round(GP_sym(0,500,nx,1.3),4); z = round(GP_sym(0,100,ny,1.5),4);
+
+% x = round(GP_sym(0,500,nx,1.3),4); z = round(GP_sym(0,100,ny,1.5),4);
 o_x = x; o_z = z;
 else 
 dx = geometric(1);
@@ -47,8 +49,9 @@ DELTAZ= zeros(size(z));
         node_num_MAT(i,j) = index;
        node_num(index) = index;
     end
-end
-
+ end
+figure
+scatter(x,z,'.')
 X = helper_row2mat(Nz,Nx,x);
 Z =helper_row2mat(Nz,Nx,z);
 
@@ -181,8 +184,8 @@ params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
 %% Generate Initial Solution
 h_old = zeros(size(x));
 if length(h_init) == 0
-hbot = -5;
-htop = -10;
+hbot = 95;
+htop = -1;
 
 for i = 1:Nz
     for j = 1:Nx
