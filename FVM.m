@@ -121,8 +121,8 @@ for i = 2:Nz-1
         
         if 80 <= z(index) && z(index) <= 100
             rint = rint + 1;
-            flux_w(rint) =  Calc_RiverBound(z(index),h(index),simple);
-            flux_w_old(rint) =  Calc_RiverBound(z(index),h_old(index),simple);
+            flux_w(rint) =  Calc_RiverBound(z(index),h(index),simple,prediction_data,t);
+            flux_w_old(rint) =  Calc_RiverBound(z(index),h_old(index),simple,prediction_data,t_old);
             F(index) = psi_new(index) - psi_old(index) + ...
                 theta * dt * (1/DELTAX(index) * (flux_e(index) - ...
                 flux_w(rint)) + 1/DELTAZ(index) * (flux_n(index) - ...
@@ -169,8 +169,8 @@ for i = Nz
     for j = 1
         index = (i-1)*Nx + j;
         rint = rint+1;
-        flux_w(rint) =  Calc_RiverBound(z(index),h(index),simple);
-        flux_w_old(rint) =  Calc_RiverBound(z(index),h_old(index),simple);
+        flux_w(rint) =  Calc_RiverBound(z(index),h(index),simple,prediction_data,t);
+        flux_w_old(rint) =  Calc_RiverBound(z(index),h_old(index),simple,prediction_data,t_old);
         flux_n(index) = Calc_RainBound(t,h(index),DELTAX(index),rain,prediction_data);
         flux_n_old(index) = Calc_RainBound(t_old,h_old(index),DELTAX(index),rain,prediction_data);
         flux_e(index) = -k_face(k_new,dx,index,1)* Kxz_face(Kxx,1,index,hetgen.boundary(index)) * ((H(index+1) - H(index))/dx(index));

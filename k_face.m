@@ -1,6 +1,6 @@
 function k_out = k_face(k,d,index,offset)
 
-sigma = 1;
+sigma = 0;
 sigmax = 1;
 if offset == 1
     k_out = k(index) - (sigmax/2)*(k(index) - k(index+1));

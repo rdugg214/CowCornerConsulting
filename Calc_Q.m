@@ -30,7 +30,7 @@ end
 
 loc = x==100  & 55 <= z & z<= 75 & t >= t_on ;%& (psi./psi_sat)>0.11;
 fr = 50;
-Q(loc) = -(Tarf * Pr)./((365)*sum(loc));
+Q(loc) = -(Tarf * Pr)./((365).*DX(loc).*DZ(loc)*sum(loc));
 
 nKzz(loc) = Kzz(loc) *fr;
 
