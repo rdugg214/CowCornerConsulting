@@ -12,44 +12,54 @@ J = sparse(zeros(N));
 ep = sqrt(eps); 
 nrmx = norm(x,2);
 
+J_test = sparse(zeros(N));
+
 % Define the size of the shift.
 if nrmx == 0
     h = ep;
 else
     h = ep*nrmx;
 end
+I = sparse(eye(N,N));
 
-FVM_PC = @(h) FVM_pre_calcs(h, dt, t, params);
-[k_old, psi_old, Q_old, ~] = FVM_PC(h_old);
-F_in = @(h, index, k_new, psi_new, Q, Kzz) FVM_index(h,dt, t, t_old,h_old, params, index, k_old, psi_old, Q_old, k_new, psi_new, Q, Kzz);
+old_method_time = 0;
+new_method_time = 0;
+
+% FVM_PC = @(h) FVM_pre_calcs(h, dt, t, params);
+% [k_old, psi_old, Q_old, ~] = FVM_PC(h_old);
+% F_in = @(h, index, k_new, psi_new, Q, Kzz) FVM_index(h,dt, t, t_old,h_old, params, index, k_old, psi_old, Q_old, k_new, psi_new, Q, Kzz);
 for j = 1:N
-    x_current = x;
-    x_current(j) = x_current(j) + h;
-    Fpert = F(x_current);
-    Jcol = (Fpert - Fx0)/h;
+%     tic;
+    Fpert = F(x +  h*I(:,j));
+    Jcol = (Fpert - Fx0)/(h / norm(I(:,j),2) );
     J(:,j) = Jcol;
+%     old_method_time = old_method_time + toc;
     
-
-%     [k_new, psi_new, Q, Kzz] = FVM_PC(x_current);
-%     J(j, j) = (F_in(x_current, [j-params{2}, j-1, j], k_new, psi_new, Q, Kzz) - Fx0(j))/h;
+%     tic;
+%     [k_new, psi_new, Q, Kzz] = FVM_PC(x + h*I(:,j));
+%     J_test(j, j) = (F_in(x + h*I(:,j), j, k_new, psi_new, Q, Kzz) - Fx0(j))/h;
 %     diag_offsets = [1, params{2}];
 %     for k = 1:length(diag_offsets)
-%         neg_index = j - diag_offsets(k);
-%         vert_neg_index = [neg_index - diag_offsets(2), neg_index - diag_offsets(1), neg_index];
-%         pos_index = j + diag_offsets(k);
-%         vert_pos_index = [pos_index - diag_offsets(2), pos_index - diag_offsets(1), pos_index];
-%         if (neg_index) > 0
-%             J(neg_index, j) = (F_in(x_current, vert_neg_index, k_new, psi_new, Q, Kzz) - Fx0(neg_index))/h;
+%         vert_neg_index = j - diag_offsets(k);
+%         vert_pos_index = j + diag_offsets(k);
+%         if (vert_neg_index) > 0
+%             J_test(vert_neg_index, j) = (F_in(x + h*I(:,j), vert_neg_index, k_new, psi_new, Q, Kzz) - Fx0(vert_neg_index))/h;
 %         end
-%         if (vert_pos_index(3)) <= N
-%             J(pos_index, j) = (F_in(x_current, vert_pos_index, k_new, psi_new, Q, Kzz) - Fx0(pos_index))/h;
+%         if (vert_pos_index) <= N
+%             J_test(vert_pos_index, j) = (F_in(x + h*I(:,j), vert_pos_index, k_new, psi_new, Q, Kzz) - Fx0(vert_pos_index))/h;
 %         end
 %     end
+   
+%     new_method_time = new_method_time + toc;
 %     Jcol = sparse(Jcol);
-%     if ~isequal(Jcol, J(:,j))
+%     if ~isequal(Jcol, J_test(:,j))
 %         disp(Jcol);
 %         disp(J_test(:,j));
-%         error("Jacobian created incorrectly")
+%         error("This is where is should fucking stop")
 %     end
 end
+% disp(old_method_time);
+% disp(new_method_time);
+% spy(J - J_test)
+%  J = J_test;
 end

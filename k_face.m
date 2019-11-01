@@ -1,7 +1,8 @@
 function k_out = k_face(k,d,index,offset)
 
-sigma = 0;
+sigma = 1;
 sigmax = 1;
+i = index+offset;
 if offset == 1
     k_out = k(index) - (sigmax/2)*(k(index) - k(index+1));
 elseif offset == -1

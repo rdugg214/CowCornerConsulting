@@ -1,4 +1,4 @@
-function [x_out,success] = NEW_Newton_Solver(F,x0,Jacobian, type, Method)
+function [x_out,success] = NEW_Newton_Solver(F,x0,Jacobian, type)
 %% Inexact Newton
 success = true;
 tola = 1e-5;
@@ -14,10 +14,8 @@ preverr = 0;
 maxerr = 1e0;
 err =Inf;
 if (type ~= "Full Newton")
-    J = Jacobian(F,x,Resid);
-    M = Find_Precon_Mat(J, "ILU", 5);
+    J = Jacobian(F,x,Resid);  
 end
-
 Method = "Normal";
 k = 0;
 while err > tol && k < MaxIters
@@ -33,22 +31,23 @@ while err > tol && k < MaxIters
     lambda = 1;
     alpha = 1e-2;
     xt = x + lambda*dx;
-%     line_search_count = 0;
-%     F_norm = norm(F(x),1)^2;
-%     Fxt_norm = norm(F(xt),1)^2;
-%     while Fxt_norm >  (1-2*alpha*lambda)*F_norm
-%         lambda_star = (F_norm * lambda^2)/(Fxt_norm + F_norm * (2 * lambda - 1));
-%         if lambda_star < lambda * 0.1
-%             lambda = lambda * 0.1;
-%         elseif lambda_star > lambda * 0.5
-%             lambda = lambda * 0.5;
-%         else
-%             lambda = lambda_star;
-%         end
-%         xt = x+lambda*dx;
-%         Fxt_norm = norm(F(xt),1)^2;
-%         line_search_count = line_search_count + 1;
-%     end
+    line_search_count = 0;
+    F_norm = norm(F(x),1)^2;
+    Fxt_norm = norm(F(xt),1)^2;
+    while Fxt_norm >  (1-2*alpha*lambda)*F_norm
+        lambda_star = (F_norm * lambda^2)/(Fxt_norm + F_norm * (2 * lambda - 1));
+        if lambda_star < lambda * 0.1
+            lambda = lambda * 0.1;
+        elseif lambda_star > lambda * 0.5
+            lambda = lambda * 0.5;
+        else
+            lambda = lambda_star;
+        end
+        xt = x+lambda*dx;
+        Fxt_norm = norm(F(xt),1)^2;
+        line_search_count = line_search_count + 1;
+    end
+%     fprintf('Line search took %d iterations to complete \n', line_search_count);
     x = xt;
     k = k + 1;
     Resid = F(x);
