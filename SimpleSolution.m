@@ -181,8 +181,8 @@ params = {N, Nx, Nz, alpha, n , m, psi_res, psi_sat, x , z, ...
 %% Generate Initial Solution
 h_old = zeros(size(x));
 if length(h_init) == 0
-hbot = 90;
-htop = -1;
+hbot = -5;
+htop = -10;
 
 for i = 1:Nz
     for j = 1:Nx
