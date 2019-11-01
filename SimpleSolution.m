@@ -50,8 +50,8 @@ DELTAZ= zeros(size(z));
        node_num(index) = index;
     end
  end
-figure
-scatter(x,z,'.')
+% figure
+% scatter(x,z,'.')
 X = helper_row2mat(Nz,Nx,x);
 Z =helper_row2mat(Nz,Nx,z);
 
