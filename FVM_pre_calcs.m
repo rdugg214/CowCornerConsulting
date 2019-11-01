@@ -15,9 +15,11 @@ function [k, psi, Q, Kzz] = FVM_pre_calcs(h, dt, t, params)
     simple = params{19};
     Pr = params{20};
     hetgen = params{21};
+    prediction_data = params{22};
+    DELCSG = params{23};
     
     S = CalcS(h, alpha, n, m);
     k = Calck(h, S, m, x, z, dx, dz, hetgen);
     psi = CalcPsi(h, S, psi_res, psi_sat,x,z,dx,dz,hetgen);
-    [Q,Kzz]=  Calc_Q(h,x,z,dt,psi,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr);
+    [Q,Kzz]=  Calc_Q(h,x,z,dt,psi,psi_sat,t,t_on_PUMP,Kzz,DELTAX,DELTAZ,simple,Pr,prediction_data);
 end

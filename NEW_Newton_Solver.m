@@ -17,7 +17,8 @@ if (type ~= "Full Newton")
     J = Jacobian(F,x,Resid);
     M = Find_Precon_Mat(J, "ILU", 5);
 end
-% Method = "GMRES";
+
+Method = "Normal";
 k = 0;
 while err > tol && k < MaxIters
     if CalculateJacobian(type, k, m, err, preverr)
@@ -27,8 +28,7 @@ while err > tol && k < MaxIters
     if Method == "Normal"
         dx = J\(-Resid);
     else 
-    
-        dx = My_GMRES(J,-Resid,x,M,tol,20,0);
+        dx = GMRES(J,-Resid,x,M,tol,20,0);
     end
     lambda = 1;
     alpha = 1e-2;
@@ -47,10 +47,9 @@ while err > tol && k < MaxIters
         end
         xt = x+lambda*dx;
         Fxt_norm = norm(F(xt),1)^2;
-%         fprintf('Norm xy %1.8e --- Norm x %1.8e \n', norm(F(xt),1)^2,  (1-2*alpha*lambda)*norm(F(x),1)^2);
         line_search_count = line_search_count + 1;
     end
-    fprintf('Line search took %d iterations to complete \n', line_search_count);
+%     fprintf('Line search took %d iterations to complete \n', line_search_count);
     x = xt;
     k = k + 1;
     Resid = F(x);
@@ -63,5 +62,5 @@ while err > tol && k < MaxIters
     end
 end
 
-
 x_out = x;
+end
