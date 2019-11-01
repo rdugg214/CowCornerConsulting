@@ -1,10 +1,10 @@
 function psi = CalcPsi(h, S, psi_res, psi_sat,x,z,dx,dz,hetgen)
-% psi = ones(size(h)).*psi_sat;
-% locs = h<0;
-% psi(locs) = psi_res(locs) + S(locs).*(psi_sat(locs)-psi_res(locs));
-% % psi(locs) = psi_res(locs) + S(locs).*(psi_sat(locs) - psi_res(locs));
-% % psi(~locs) = psi_sat(~locs);
-psi = zeros(size(h));
+%% Homogenous Psi Calc
+psi = ones(size(h)).*psi_sat;
+locs = h<0;
+psi(locs) = psi_res(locs) + S(locs).*(psi_sat(locs)-psi_res(locs));
+
+%% Heterogeneous
 % for i = 1:length(h)
 %     if h(i)<0 && hetgen.boundary(i) && (z(i) == 100 || z(i) == 0 || x(i) == 0 || x(i) == 500)
 %      psi(i) = psi_res(i)+S(i) *(psi_sat(i) - psi_res(i));
@@ -21,11 +21,5 @@ psi = zeros(size(h));
 %     psi(i) = psi_sat(i);
 %     end
 % end
- for i = 1:length(h)
-    if h(i)<0 
-    psi(i) = psi_res(i)+S(i) *(psi_sat(i) - psi_res(i));
-    else
-    psi(i) = psi_sat(i);
-    end
-end
+
 end

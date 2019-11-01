@@ -1,11 +1,9 @@
 function k = Calck(h, S, m,x,z,dx,dz,hetgen)
-%     k = ones(size(h));
-%     inner = Svec(i)(locs).*(1./mvec(i)(locs));
-%     innera = (1-inner);
-%     innerb = (1-innera).^(mvec(i)(locs));
-%   k(locs) = sqrt(Svec(i)(locs)) .* innerb.^2;
-%  k(locs) = sqrt(Svec(i)(locs)) .* (1 - (1 - Svec(i)(locs).^(1./mvec(i)(locs))).^(mvec(i)(locs))).^2;
-    k = zeros(size(h));
+%% Homoogenous
+    k = ones(size(h));
+    locs = h<0;
+    k(locs) = sqrt(S(locs)) .* (1 - (1 - S(locs).^(1./m(locs))).^(m(locs))).^2;
+%% Heterogenous
 % for i = 1:length(h)
 %     if h(i)<0 && hetgen.boundary(i) && (z(i) == 100 || z(i) == 0 || x(i) == 0 || x(i) == 500)
 %     k(i) = sqrt(S(i)) *  ((1-((1- (S(i)^(1/m(i))))^m(i)))^2);
@@ -24,12 +22,5 @@ function k = Calck(h, S, m,x,z,dx,dz,hetgen)
 %     end
 % 
 % end
-for i = 1:length(h)
-   if h(i)<0
-            k(i) = sqrt(S(i)) *  ((1-((1- (S(i)^(1/m(i))))^m(i)))^2);
-    else
-        k(i) = 1;
-    end
 
-end
 end

@@ -60,7 +60,7 @@ T_annual = [V_annual(k1:k2) T_annual];
 
 %% Predicting future annual data
 % Requried number of years
-n = 100;
+n = 200;
 [prediction_data] = annual_predictor(T_annual,n);
 
 %% Plotting predicted and previous data
